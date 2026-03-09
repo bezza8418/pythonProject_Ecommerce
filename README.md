@@ -2,13 +2,14 @@
 
 ## 📋 Описание
 
-Проект представляет собой ядро интернет-магазина с базовыми классами для работы с товарами и категориями. Реализована загрузка данных из JSON-файла.
+Проект представляет собой ядро интернет-магазина с базовыми классами для работы с товарами и категориями. Реализована загрузка данных из/в JSON-файла.
 
 ### Основные возможности:
 - ✅ Создание товаров с названием, описанием, ценой и количеством
 - ✅ Создание категорий с названием, описанием и списком товаров
 - ✅ Автоматический подсчет количества категорий и товаров
-- ✅ Загрузка данных из JSON-файла (дополнительное задание)
+- ✅ Загрузка данных из JSON-файла
+- ✅ Сохранение данных в JSON-файл
 
 ## 🚀 Установка
 
@@ -40,11 +41,20 @@ category = Category("Смартфоны", "Описание категории",
 
 Загрузка из JSON:
 ```python
-from src.category import Category
+from src.utils import load_categories_from_json
 
-categories = Category.load_from_json("data/products.json")
+categories = load_categories_from_json("data/products.json")
 for category in categories:
     print(f"{category.name}: {len(category.products)} товаров")
+```
+
+Сохранение в JSON:
+```python
+from src.utils import load_categories_from_json, save_categories_to_json
+
+categories = load_categories_from_json("data/products.json")
+
+save_categories_to_json(categories, "data/new_products.json")
 ```
 
 Запуск демонстрации:
@@ -57,6 +67,9 @@ poetry run python main.py
 # Запуск всех тестов
 poetry run pytest
 
+# Запуск с подробным выводом
+poetry run pytest -v
+
 # Запуск с отчетом о покрытии
 poetry run pytest --cov=src --cov-report=term-missing
 
@@ -66,14 +79,17 @@ poetry run pytest --cov=src --cov-report=html
 
 ## 📊 Покрытие тестами
 ### Статистика покрытия (100%)
-| Модуль            | Строк  | Пропущено | Покрытие |
-|-------------------|--------|-----------|----------|
-| `__init__.py`     | 3      | 0         | 100%     |
-| `category.py`     | 25     | 0         | 100%     |
-| `product.py`      | 7      | 0         | 100%     |
-| **ИТОГО**         | **35** | **0**     | **100%** |
+| Модуль        | Строк  | Пропущено | Покрытие |
+|---------------|--------|-----------|----------|
+| `__init__.py` | 4      | 0         | 100%     |
+| `category.py` | 11     | 0         | 100%     |
+| `product.py`  | 7      | 0         | 100%     |
+| `utils.py`    | 23     | 0         | 100%     |
+| **ИТОГО**     | **45** | **0**     | **100%** |
 
+Просмотр отчета:
 
+После генерации HTML-отчета откройте htmlcov/index.html в браузере для детального просмотра покрытия.
 
 ## 🔧 Инструменты качества кода
 ```bash
@@ -93,14 +109,17 @@ poetry run mypy src/
 ```
 pythonProject_Ecommerce/
 ├── data/                   # Данные в формате JSON
+├── htmlcov/                # Отчет о покрытии тестами
 ├── src/                    # Исходный код
 │   ├── __init__.py
 │   ├── category.py         # Класс Category
-│   └── product.py          # Класс Product
+│   ├── product.py          # Класс Product
+│   └── utils.py            # Утилиты для работы с JSON
 ├── tests/                  # Тесты
 │   ├── __init__.py
 │   ├── test_category.py
-│   └── test_product.py
+│   ├── test_product.py
+│   └── test_utils.py
 ├── .flake8                 # Конфигурация flake8
 ├── .gitignore              # Игнорируемые файлы
 ├── main.py                 # Точка входа
