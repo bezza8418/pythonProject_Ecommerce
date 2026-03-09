@@ -7,6 +7,7 @@ import pytest
 
 from src.category import Category
 from src.product import Product
+from src.utils import load_categories_from_json
 
 
 @pytest.fixture
@@ -63,13 +64,15 @@ class TestCategory:
 class TestCategoryCounters:
     """Тесты для счетчиков категорий и товаров."""
 
-    def setup_method(self):
+    @staticmethod
+    def setup_method():
         """Сброс счетчиков перед каждым тестом."""
         Category.category_count = 0
         Category.product_count = 0
 
     def test_category_count_increases(self):
         """Тест увеличения счетчика категорий."""
+        self.setup_method()
         Category("Категория 1", "Описание 1", [])
         assert Category.category_count == 1
 
@@ -78,6 +81,7 @@ class TestCategoryCounters:
 
     def test_product_count_increases(self, sample_products):
         """Тест увеличения счетчика товаров."""
+        self.setup_method()
         Category("Категория 1", "Описание 1", sample_products[:2])
         assert Category.product_count == 2
 
@@ -86,6 +90,7 @@ class TestCategoryCounters:
 
     def test_counters_with_multiple_categories(self, sample_products):
         """Тест счетчиков при создании нескольких категорий."""
+        self.setup_method()
         Category("Смартфоны", "Описание", sample_products[:2])
         Category("Планшеты", "Описание", sample_products[2:])
         Category("Ноутбуки", "Описание", [])
@@ -95,9 +100,7 @@ class TestCategoryCounters:
 
     def test_load_from_json(self, tmp_path):
         """Тест загрузки категорий из JSON-файла."""
-        # Сброс счетчиков
-        Category.category_count = 0
-        Category.product_count = 0
+        self.setup_method()
 
         # Создаем временный JSON-файл
         json_data = [
@@ -138,7 +141,7 @@ class TestCategoryCounters:
             json.dump(json_data, f)
 
         # Загружаем категории
-        categories = Category.load_from_json(str(json_path))
+        categories = load_categories_from_json(str(json_path))
 
         # Проверяем результат
         assert len(categories) == 2
@@ -148,11 +151,31 @@ class TestCategoryCounters:
         assert categories[0].products[0].name == "Test Phone 1"
         assert categories[0].products[0].price == 10000.0
         assert categories[0].products[1].name == "Test Phone 2"
+        assert categories[0].products[1].price == 20000.0
 
         assert categories[1].name == "Телевизоры"
+        assert categories[1].description == "Тестовое описание телевизоров"
         assert len(categories[1].products) == 1
         assert categories[1].products[0].name == "Test TV"
+        assert categories[1].products[0].price == 50000.0
+        assert categories[1].products[0].quantity == 2
 
         # Проверяем счетчики
         assert Category.category_count == 2
-        assert Category.product_count == 3
+        assert Category.product_count == 3  # 2 + 1 = 3
+
+    def test_load_from_json_file_not_found(self):
+        """Тест загрузки из несуществующего файла."""
+        self.setup_method()
+        with pytest.raises(FileNotFoundError):
+            load_categories_from_json("nonexistent.json")
+
+    def test_load_from_json_invalid_json(self, tmp_path):
+        """Тест загрузки из некорректного JSON-файла."""
+        self.setup_method()
+        json_path = tmp_path / "invalid.json"
+        with open(json_path, 'w', encoding='utf-8') as f:
+            f.write("{invalid json}")
+
+        with pytest.raises(json.JSONDecodeError):
+            load_categories_from_json(str(json_path))

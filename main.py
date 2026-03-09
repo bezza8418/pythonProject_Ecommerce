@@ -5,10 +5,15 @@
 import os
 from src.category import Category
 from src.product import Product
+from src.utils import load_categories_from_json
 
 
 def main():
     """Демонстрация работы классов."""
+    # Сброс счетчиков для чистоты демонстрации
+    Category.category_count = 0
+    Category.product_count = 0
+
     # Способ 1: Создание объектов вручную
     print("=== СОЗДАНИЕ ВРУЧНУЮ ===")
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
@@ -26,12 +31,12 @@ def main():
     print(f"  - {product2.name}: {product2.price} руб., {product2.quantity} шт.")
     print(f"  - {product3.name}: {product3.price} руб., {product3.quantity} шт.")
 
-    # Способ 2: Загрузка из JSON (дополнительное задание)
+    # Способ 2: Загрузка из JSON
     print("\n=== ЗАГРУЗКА ИЗ JSON ===")
     json_path = os.path.join(os.path.dirname(__file__), "data", "products.json")
 
     try:
-        categories = Category.load_from_json(json_path)
+        categories = load_categories_from_json(json_path)
 
         print(f"Загружено категорий: {len(categories)}")
         for i, category in enumerate(categories, 1):
@@ -39,7 +44,6 @@ def main():
             print(f"   Описание: {category.description[:60]}...")
             print(f"   Товаров: {len(category.products)}")
 
-            # Выводим все товары в категории
             for product in category.products:
                 print(f"     - {product.name}: {product.price} руб., {product.quantity} шт.")
 
@@ -55,7 +59,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # Сброс счетчиков для чистоты демонстрации
-    Category.category_count = 0
-    Category.product_count = 0
     main()
