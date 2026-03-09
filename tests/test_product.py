@@ -2,8 +2,6 @@
 Тесты для модуля product.
 """
 
-import pytest
-
 from src.product import Product
 
 
@@ -43,4 +41,4 @@ class TestProduct:
         """Тест товара с отрицательным количеством."""
         product = Product("Test Product", "Test Description", 100.0, -5)
 
-        assert product.quantity == -5  # В реальном проекте нужна валидация
+        assert product.quantity == -5

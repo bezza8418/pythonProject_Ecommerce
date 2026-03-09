@@ -35,7 +35,10 @@ class TestCategory:
     def test_category_initialization(self, sample_category, sample_products):
         """Тест инициализации категории."""
         assert sample_category.name == "Смартфоны"
-        assert sample_category.description == "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни"
+        assert sample_category.description == (
+            "Смартфоны, как средство не только коммуникации, "
+            "но и получения дополнительных функций для удобства жизни"
+        )
         assert sample_category.products == sample_products
         assert len(sample_category.products) == 3
 
@@ -67,30 +70,30 @@ class TestCategoryCounters:
 
     def test_category_count_increases(self):
         """Тест увеличения счетчика категорий."""
-        category1 = Category("Категория 1", "Описание 1", [])
+        Category("Категория 1", "Описание 1", [])
         assert Category.category_count == 1
 
-        category2 = Category("Категория 2", "Описание 2", [])
+        Category("Категория 2", "Описание 2", [])
         assert Category.category_count == 2
 
     def test_product_count_increases(self, sample_products):
         """Тест увеличения счетчика товаров."""
-        category1 = Category("Категория 1", "Описание 1", sample_products[:2])
+        Category("Категория 1", "Описание 1", sample_products[:2])
         assert Category.product_count == 2
 
-        category2 = Category("Категория 2", "Описание 2", sample_products[2:])
+        Category("Категория 2", "Описание 2", sample_products[2:])
         assert Category.product_count == 3
 
     def test_counters_with_multiple_categories(self, sample_products):
         """Тест счетчиков при создании нескольких категорий."""
-        cat1 = Category("Смартфоны", "Описание", sample_products[:2])
-        cat2 = Category("Планшеты", "Описание", sample_products[2:])
-        cat3 = Category("Ноутбуки", "Описание", [])
+        Category("Смартфоны", "Описание", sample_products[:2])
+        Category("Планшеты", "Описание", sample_products[2:])
+        Category("Ноутбуки", "Описание", [])
 
         assert Category.category_count == 3
         assert Category.product_count == 3  # 2 + 1 + 0
 
-    def test_load_from_json(self, tmp_path, sample_products):
+    def test_load_from_json(self, tmp_path):
         """Тест загрузки категорий из JSON-файла."""
         # Сброс счетчиков
         Category.category_count = 0
