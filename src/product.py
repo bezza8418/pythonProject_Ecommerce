@@ -31,63 +31,6 @@ class Product:
     @price.setter
     def price(self, value: Union[float, int]) -> None:
         """
-        Сеттер для цены с проверкой на положительное значение.
-
-        Args:
-            value: Новое значение цены
-        """
-        if value <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
-        else:
-            self.__price = float(value)
-
-    @classmethod
-    def new_product(cls, product_data: Dict[str, Union[str, float, int]],
-                   existing_products: Optional[List['Product']] = None) -> 'Product':
-        """
-        Класс-метод для создания нового продукта из словаря.
-
-        Args:
-            product_data: Словарь с данными о продукте
-            existing_products: Список существующих продуктов для проверки дубликатов
-
-        Returns:
-            Новый экземпляр класса Product
-        """
-        name = product_data.get('name', '')
-        description = product_data.get('description', '')
-        price = product_data.get('price', 0.0)
-        quantity = product_data.get('quantity', 0)
-
-        # Проверка на дубликаты (дополнительное задание)
-        if existing_products:
-            for existing in existing_products:
-                if existing.name == name:
-                    # Если товар уже существует, складываем количество
-                    # и берем максимальную цену
-                    quantity += existing.quantity
-                    price = max(float(price), existing.price)
-                    # Удаляем старый товар из списка (будет заменен новым)
-                    existing_products.remove(existing)
-                    break
-
-        return cls(name, description, price, quantity)
-
-    @classmethod
-    def new_product_simple(cls, product_data: Dict[str, Union[str, float, int]]) -> 'Product':
-        """
-        Упрощенная версия класс-метода без проверки дубликатов.
-        """
-        return cls(
-            name=product_data.get('name', ''),
-            description=product_data.get('description', ''),
-            price=product_data.get('price', 0.0),
-            quantity=product_data.get('quantity', 0)
-        )
-
-    @price.setter
-    def price(self, value: Union[float, int]) -> None:
-        """
         Сеттер для цены с проверкой на положительное значение
         и подтверждением при понижении цены.
 
@@ -100,7 +43,7 @@ class Product:
 
         # Проверка на понижение цены
         if value < self.__price:
-            print(f"Вы确实 собираетесь понизить цену с {self.__price} до {value}?")
+            print(f"Вы действительно хотите понизить цену с {self.__price} до {value}?")
             answer = input("Подтвердите действие (y/n): ").strip().lower()
 
             if answer == 'y':
@@ -110,3 +53,84 @@ class Product:
                 print("Изменение цены отменено")
         else:
             self.__price = float(value)
+
+    @classmethod
+    def new_product(cls, product_data: Dict[str, Union[str, float, int]],
+                    existing_products: Optional[List['Product']] = None) -> 'Product':
+        """
+        Класс-метод для создания нового продукта из словаря.
+
+        Args:
+            product_data: Словарь с данными о продукте
+            existing_products: Список существующих продуктов для проверки дубликатов
+
+        Returns:
+            Новый экземпляр класса Product
+        """
+        # Получаем значения из словаря с правильными типами
+        name = str(product_data.get('name', ''))
+        description = str(product_data.get('description', ''))
+
+        # Обрабатываем цену
+        price_value = product_data.get('price', 0)
+        if isinstance(price_value, str):
+            try:
+                price = float(price_value)
+            except ValueError:
+                price = 0.0
+        else:
+            price = float(price_value)
+
+        # Обрабатываем количество
+        quantity_value = product_data.get('quantity', 0)
+        if isinstance(quantity_value, str):
+            try:
+                quantity = int(quantity_value)
+            except ValueError:
+                quantity = 0
+        else:
+            quantity = int(quantity_value)
+
+        # Проверка на дубликаты (дополнительное задание)
+        if existing_products:
+            for existing in existing_products:
+                if existing.name == name:
+                    # Если товар уже существует, складываем количество
+                    # и берем максимальную цену
+                    quantity += existing.quantity
+                    price = max(price, existing.price)
+                    # Удаляем старый товар из списка (будет заменен новым)
+                    existing_products.remove(existing)
+                    break
+
+        return cls(name, description, price, quantity)
+
+    @classmethod
+    def new_product_simple(cls, product_data: Dict[str, Union[str, float, int]]) -> 'Product':
+        """
+        Упрощенная версия класс-метода без проверки дубликатов.
+        """
+        name = str(product_data.get('name', ''))
+        description = str(product_data.get('description', ''))
+
+        # Обрабатываем цену
+        price_value = product_data.get('price', 0)
+        if isinstance(price_value, str):
+            try:
+                price = float(price_value)
+            except ValueError:
+                price = 0.0
+        else:
+            price = float(price_value)
+
+        # Обрабатываем количество
+        quantity_value = product_data.get('quantity', 0)
+        if isinstance(quantity_value, str):
+            try:
+                quantity = int(quantity_value)
+            except ValueError:
+                quantity = 0
+        else:
+            quantity = int(quantity_value)
+
+        return cls(name, description, price, quantity)

@@ -14,7 +14,9 @@ class Category:
     category_count: int = 0
     product_count: int = 0
 
-    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
+    def __init__(
+        self, name: str, description: str, products: Optional[List[Product]] = None
+    ) -> None:
         """
         Инициализация категории.
 
@@ -45,7 +47,9 @@ class Category:
 
         result = []
         for product in self.__products:
-            result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
+            result.append(
+                f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт."
+            )
         return "\n".join(result) + ("\n" if result else "")
 
     def add_product(self, product: Product) -> None:

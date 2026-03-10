@@ -35,7 +35,6 @@ poetry install
 from src.product import Product
 from src.category import Category
 
-
 # Создание товаров
 product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
 product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
@@ -48,17 +47,22 @@ category = Category("Смартфоны", "Описание категории",
 ```python
 from src.utils import load_categories_from_json
 
+# Загружаем категории из файла
 categories = load_categories_from_json("data/products.json")
-for category in categories:
-    print(f"{category.name}: {len(category.products)} товаров")
+
+# Выводим информацию о каждой категории
+for cat in categories:
+    print(f"{cat.name}: {len(cat.products_list)} товаров")
 ```
 
 - Сохранение в JSON:
 ```python
 from src.utils import load_categories_from_json, save_categories_to_json
 
+# Загружаем категории из файла
 categories = load_categories_from_json("data/products.json")
 
+# Сохраняем их в новый файл
 save_categories_to_json(categories, "data/new_products.json")
 ```
 
@@ -69,12 +73,36 @@ save_categories_to_json(categories, "data/new_products.json")
 
 Добавление товаров в категорию:
 ```python
-# Товары добавляются через специальный метод
+from src.product import Product
+from src.category import Category
+
+# Создаем товары
+product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+
+# Создаем категорию
+category = Category("Смартфоны", "Описание категории", [product1, product2])
+
+# Создаем новый товар
+new_product = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+
+# Добавляем товар через специальный метод
 category.add_product(new_product)
 ```
 
 Просмотр товаров через геттер
 ```python
+# Предположим, у нас есть категория с товарами
+from src.product import Product
+from src.category import Category
+
+# Создаем товары
+product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+
+# Создаем категорию
+category = Category("Смартфоны", "Описание категории", [product1, product2])
+
 # Геттер возвращает красиво отформатированную строку
 print(category.products)
 # Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт.
@@ -83,6 +111,9 @@ print(category.products)
 
 Создание товаров из словаря
 ```python
+from src.product import Product
+
+# Создаем товар из словаря
 data = {
     "name": "Samsung Galaxy S23 Ultra",
     "description": "256GB, Серый цвет, 200MP камера",
@@ -92,13 +123,27 @@ data = {
 product = Product.new_product(data)
 
 # При наличии дубликатов происходит объединение
+product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
 existing_products = [product1, product2]
-product = Product.new_product(data, existing_products)
-# Количество складывается, цена выбирается максимальная
+
+# Создаем новый товар с проверкой дубликатов
+data2 = {
+    "name": "Samsung Galaxy S23 Ultra",
+    "description": "Новое описание",
+    "price": 190000.0,
+    "quantity": 3
+}
+new_product = Product.new_product(data2, existing_products)
+# Количество складывается (5+3=8), цена выбирается максимальная (190000.0)
 ```
 
 Безопасное изменение цены
 ```python
+from src.product import Product
+
+product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+
 product.price = 200000.0  # Повышение цены без подтверждения
 product.price = 150000.0  # Понижение цены требует подтверждения
 # Вы действительно хотите понизить цену? (y/n)
@@ -125,14 +170,14 @@ poetry run pytest --cov=src --cov-report=html
 ```
 
 ## 📊 Покрытие тестами
-### Статистика покрытия (90%)
+### Статистика покрытия (89%)
 | Модуль        | Строк   | Пропущено | Покрытие |
 |---------------|---------|-----------|----------|
 | `__init__.py` | 4       | 0         | 100%     |
 | `category.py` | 25      | 0         | 100%     |
-| `product.py`  | 45      | 3         | 93%      |
+| `product.py`  | 68      | 8         | 88%      |
 | `utils.py`    | 51      | 9         | 82%      |
-| **ИТОГО**     | **125** | **12**    | **90%**  |
+| **ИТОГО**     | **148** | **17**    | **89%**  |
 
 Просмотр отчета:
 

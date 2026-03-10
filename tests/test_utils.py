@@ -3,6 +3,7 @@
 """
 
 import json
+
 import pytest
 
 from src.category import Category
@@ -41,7 +42,7 @@ class TestUtils:
         assert json_path.exists()
 
         # Загружаем и проверяем содержимое
-        with open(json_path, 'r', encoding='utf-8') as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         assert len(data) == 2
@@ -74,14 +75,30 @@ class TestUtils:
         assert len(loaded_categories) == len(sample_categories)
         assert loaded_categories[0].name == sample_categories[0].name
         assert loaded_categories[0].description == sample_categories[0].description
-        assert len(loaded_categories[0].products_list) == len(sample_categories[0].products_list)
-        assert loaded_categories[0].products_list[0].name == sample_categories[0].products_list[0].name
-        assert loaded_categories[0].products_list[0].price == sample_categories[0].products_list[0].price
-        assert loaded_categories[0].products_list[1].name == sample_categories[0].products_list[1].name
+        assert len(loaded_categories[0].products_list) == len(
+            sample_categories[0].products_list
+        )
+        assert (
+            loaded_categories[0].products_list[0].name
+            == sample_categories[0].products_list[0].name
+        )
+        assert (
+            loaded_categories[0].products_list[0].price
+            == sample_categories[0].products_list[0].price
+        )
+        assert (
+            loaded_categories[0].products_list[1].name
+            == sample_categories[0].products_list[1].name
+        )
 
         assert loaded_categories[1].name == sample_categories[1].name
-        assert len(loaded_categories[1].products_list) == len(sample_categories[1].products_list)
-        assert loaded_categories[1].products_list[0].name == sample_categories[1].products_list[0].name
+        assert len(loaded_categories[1].products_list) == len(
+            sample_categories[1].products_list
+        )
+        assert (
+            loaded_categories[1].products_list[0].name
+            == sample_categories[1].products_list[0].name
+        )
 
     def test_save_categories_to_json_empty_list(self, tmp_path):
         """Тест сохранения пустого списка категорий."""
@@ -90,14 +107,16 @@ class TestUtils:
         save_categories_to_json([], str(json_path))
 
         assert json_path.exists()
-        with open(json_path, 'r', encoding='utf-8') as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         assert data == []
 
     def test_save_categories_to_json_invalid_path(self, sample_categories):
         """Тест сохранения по некорректному пути."""
         with pytest.raises(Exception):
-            save_categories_to_json(sample_categories, "/invalid/path/that/doesnt/exist/file.json")
+            save_categories_to_json(
+                sample_categories, "/invalid/path/that/doesnt/exist/file.json"
+            )
 
     def test_load_categories_from_json_file_not_found(self):
         """Тест загрузки из несуществующего файла."""
@@ -107,7 +126,7 @@ class TestUtils:
     def test_load_categories_from_json_invalid_json(self, tmp_path):
         """Тест загрузки из некорректного JSON-файла."""
         json_path = tmp_path / "invalid.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             f.write("{invalid json")
 
         with pytest.raises(json.JSONDecodeError):
@@ -116,7 +135,7 @@ class TestUtils:
     def test_load_categories_from_json_empty_file(self, tmp_path):
         """Тест загрузки из пустого файла."""
         json_path = tmp_path / "empty.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             f.write("")
 
         with pytest.raises(json.JSONDecodeError):
@@ -125,7 +144,7 @@ class TestUtils:
     def test_load_categories_from_json_not_list(self, tmp_path):
         """Тест загрузки из JSON, где данные не список."""
         json_path = tmp_path / "not_list.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump({"key": "value"}, f)
 
         # Должен вернуть пустой список, а не падать
@@ -137,16 +156,11 @@ class TestUtils:
         json_data = [
             {
                 "name": "Категория без описания",
-                "products": [
-                    {
-                        "name": "Товар без цены",
-                        "description": "Описание"
-                    }
-                ]
+                "products": [{"name": "Товар без цены", "description": "Описание"}],
             }
         ]
         json_path = tmp_path / "missing_fields.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(json_data, f)
 
         categories = load_categories_from_json(str(json_path))

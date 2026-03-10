@@ -3,6 +3,7 @@
 """
 
 import json
+
 import pytest
 
 from src.category import Category
@@ -14,7 +15,9 @@ from src.utils import load_categories_from_json
 def sample_products():
     """Фикстура с тестовыми товарами."""
     return [
-        Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5),
+        Product(
+            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+        ),
         Product("Iphone 15", "512GB, Gray space", 210000.0, 8),
         Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14),
     ]
@@ -26,7 +29,7 @@ def sample_category(sample_products):
     return Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-        sample_products
+        sample_products,
     )
 
 
@@ -112,7 +115,9 @@ class TestCategoryAddProduct:
         assert len(sample_category.products_list) == initial_category_len + 1
         assert sample_category.products_list[-1].name == "Samsung Galaxy S23 Ultra"
 
-    def test_add_product_updates_products_string(self, sample_category, sample_products):
+    def test_add_product_updates_products_string(
+        self, sample_category, sample_products
+    ):
         """Тест, что геттер обновляется после добавления товара."""
         initial_products_str = sample_category.products
         sample_category.add_product(sample_products[0])
@@ -159,9 +164,12 @@ class TestCategoryCounters:
 
     def test_counters_with_multiple_categories(self, sample_products):
         """Тест счетчиков при создании нескольких категорий."""
-        cat1 = Category("Смартфоны", "Описание", sample_products[:2])
-        cat2 = Category("Планшеты", "Описание", sample_products[2:])
-        cat3 = Category("Ноутбуки", "Описание", [])
+        Category.category_count = 0
+        Category.product_count = 0
+
+        Category("Смартфоны", "Описание", sample_products[:2])
+        Category("Планшеты", "Описание", sample_products[2:])
+        Category("Ноутбуки", "Описание", [])
 
         assert Category.category_count == 3
         assert Category.product_count == 3  # 2 + 1 + 0
@@ -186,15 +194,15 @@ class TestCategoryUtils:
                         "name": "Test Phone 1",
                         "description": "Test Description 1",
                         "price": 10000.0,
-                        "quantity": 5
+                        "quantity": 5,
                     },
                     {
                         "name": "Test Phone 2",
                         "description": "Test Description 2",
                         "price": 20000.0,
-                        "quantity": 3
-                    }
-                ]
+                        "quantity": 3,
+                    },
+                ],
             },
             {
                 "name": "Телевизоры",
@@ -204,14 +212,14 @@ class TestCategoryUtils:
                         "name": "Test TV",
                         "description": "Test TV Description",
                         "price": 50000.0,
-                        "quantity": 2
+                        "quantity": 2,
                     }
-                ]
-            }
+                ],
+            },
         ]
 
         json_path = tmp_path / "test_products.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(json_data, f)
 
         # Загружаем категории
@@ -239,7 +247,7 @@ class TestCategoryUtils:
     def test_load_from_json_invalid_json(self, tmp_path):
         """Тест загрузки из некорректного JSON-файла."""
         json_path = tmp_path / "invalid.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             f.write("{invalid json")
 
         with pytest.raises(json.JSONDecodeError):
