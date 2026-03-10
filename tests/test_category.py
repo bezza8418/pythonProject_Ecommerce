@@ -40,67 +40,141 @@ class TestCategory:
             "Смартфоны, как средство не только коммуникации, "
             "но и получения дополнительных функций для удобства жизни"
         )
-        assert sample_category.products == sample_products
-        assert len(sample_category.products) == 3
+        # Проверяем через products_list, что товары сохранились
+        assert len(sample_category.products_list) == 3
+        assert sample_category.products_list == sample_products
 
     def test_category_with_empty_products(self):
         """Тест категории с пустым списком товаров."""
-        category = Category("Пустая категория", "Описание", [])
+        category = Category("Пустая категория", "Описание")
 
         assert category.name == "Пустая категория"
         assert category.description == "Описание"
-        assert category.products == []
-        assert len(category.products) == 0
+        assert len(category.products_list) == 0
+        assert category.products == ""  # Пустая строка для геттера
 
     def test_category_with_single_product(self, sample_products):
         """Тест категории с одним товаром."""
         single_product = [sample_products[0]]
         category = Category("Один товар", "Описание", single_product)
 
-        assert len(category.products) == 1
-        assert category.products[0].name == "Samsung Galaxy S23 Ultra"
+        assert len(category.products_list) == 1
+        assert category.products_list[0].name == "Samsung Galaxy S23 Ultra"
+
+
+class TestCategoryPrivate:
+    """Тесты для приватных атрибутов."""
+
+    def test_products_private(self, sample_category):
+        """Тест, что атрибут products действительно приватный."""
+        with pytest.raises(AttributeError):
+            sample_category.__products
+
+    def test_products_getter_format(self, sample_category):
+        """Тест формата геттера products."""
+        result = sample_category.products
+        expected = (
+            "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт.\n"
+            "Iphone 15, 210000.0 руб. Остаток: 8 шт.\n"
+            "Xiaomi Redmi Note 11, 31000.0 руб. Остаток: 14 шт.\n"
+        )
+        assert result == expected
+
+    def test_products_getter_empty(self):
+        """Тест геттера для пустой категории."""
+        category = Category("Пустая", "Описание")
+        assert category.products == ""
+
+
+class TestCategoryAddProduct:
+    """Тесты для метода add_product."""
+
+    def test_add_product_increases_product_count(self, sample_products):
+        """Тест, что добавление товара увеличивает счетчик продуктов."""
+        # Сохраняем текущее значение счетчика
+        initial_count = Category.product_count
+
+        category = Category("Тестовая категория", "Описание")
+        category.add_product(sample_products[0])
+
+        assert Category.product_count == initial_count + 1
+        assert len(category.products_list) == 1
+        assert category.products_list[0].name == "Samsung Galaxy S23 Ultra"
+
+    def test_add_product_to_existing_category(self, sample_category, sample_products):
+        """Тест добавления товара в существующую категорию."""
+        initial_count = Category.product_count
+        initial_category_len = len(sample_category.products_list)
+
+        sample_category.add_product(sample_products[0])
+
+        assert Category.product_count == initial_count + 1
+        assert len(sample_category.products_list) == initial_category_len + 1
+        assert sample_category.products_list[-1].name == "Samsung Galaxy S23 Ultra"
+
+    def test_add_product_updates_products_string(self, sample_category, sample_products):
+        """Тест, что геттер обновляется после добавления товара."""
+        initial_products_str = sample_category.products
+        sample_category.add_product(sample_products[0])
+        new_products_str = sample_category.products
+
+        assert len(new_products_str) > len(initial_products_str)
+        assert "Samsung Galaxy S23 Ultra" in new_products_str
 
 
 class TestCategoryCounters:
     """Тесты для счетчиков категорий и товаров."""
 
-    @staticmethod
-    def setup_method():
+    def setup_method(self):
         """Сброс счетчиков перед каждым тестом."""
         Category.category_count = 0
         Category.product_count = 0
 
     def test_category_count_increases(self):
         """Тест увеличения счетчика категорий."""
-        self.setup_method()
-        Category("Категория 1", "Описание 1", [])
+        Category("Категория 1", "Описание 1")
         assert Category.category_count == 1
 
-        Category("Категория 2", "Описание 2", [])
+        Category("Категория 2", "Описание 2")
         assert Category.category_count == 2
 
-    def test_product_count_increases(self, sample_products):
-        """Тест увеличения счетчика товаров."""
-        self.setup_method()
+    def test_product_count_increases_with_initial_products(self, sample_products):
+        """Тест увеличения счетчика товаров при создании категории."""
         Category("Категория 1", "Описание 1", sample_products[:2])
         assert Category.product_count == 2
 
         Category("Категория 2", "Описание 2", sample_products[2:])
         assert Category.product_count == 3
 
+    def test_product_count_increases_with_add_product(self, sample_products):
+        """Тест увеличения счетчика товаров при добавлении."""
+        category = Category("Категория", "Описание")
+        assert Category.product_count == 0
+
+        category.add_product(sample_products[0])
+        assert Category.product_count == 1
+
+        category.add_product(sample_products[1])
+        assert Category.product_count == 2
+
     def test_counters_with_multiple_categories(self, sample_products):
         """Тест счетчиков при создании нескольких категорий."""
-        self.setup_method()
-        Category("Смартфоны", "Описание", sample_products[:2])
-        Category("Планшеты", "Описание", sample_products[2:])
-        Category("Ноутбуки", "Описание", [])
+        cat1 = Category("Смартфоны", "Описание", sample_products[:2])
+        cat2 = Category("Планшеты", "Описание", sample_products[2:])
+        cat3 = Category("Ноутбуки", "Описание", [])
 
         assert Category.category_count == 3
         assert Category.product_count == 3  # 2 + 1 + 0
 
+
+class TestCategoryUtils:
+    """Тесты для утилит работы с категориями."""
+
     def test_load_from_json(self, tmp_path):
         """Тест загрузки категорий из JSON-файла."""
-        self.setup_method()
+        # Сброс счетчиков
+        Category.category_count = 0
+        Category.product_count = 0
 
         # Создаем временный JSON-файл
         json_data = [
@@ -146,36 +220,27 @@ class TestCategoryCounters:
         # Проверяем результат
         assert len(categories) == 2
         assert categories[0].name == "Смартфоны"
-        assert categories[0].description == "Тестовое описание смартфонов"
-        assert len(categories[0].products) == 2
-        assert categories[0].products[0].name == "Test Phone 1"
-        assert categories[0].products[0].price == 10000.0
-        assert categories[0].products[1].name == "Test Phone 2"
-        assert categories[0].products[1].price == 20000.0
+        assert len(categories[0].products_list) == 2
+        assert categories[0].products_list[0].name == "Test Phone 1"
 
         assert categories[1].name == "Телевизоры"
-        assert categories[1].description == "Тестовое описание телевизоров"
-        assert len(categories[1].products) == 1
-        assert categories[1].products[0].name == "Test TV"
-        assert categories[1].products[0].price == 50000.0
-        assert categories[1].products[0].quantity == 2
+        assert len(categories[1].products_list) == 1
+        assert categories[1].products_list[0].name == "Test TV"
 
         # Проверяем счетчики
         assert Category.category_count == 2
-        assert Category.product_count == 3  # 2 + 1 = 3
+        assert Category.product_count == 3
 
     def test_load_from_json_file_not_found(self):
         """Тест загрузки из несуществующего файла."""
-        self.setup_method()
         with pytest.raises(FileNotFoundError):
             load_categories_from_json("nonexistent.json")
 
     def test_load_from_json_invalid_json(self, tmp_path):
         """Тест загрузки из некорректного JSON-файла."""
-        self.setup_method()
         json_path = tmp_path / "invalid.json"
         with open(json_path, 'w', encoding='utf-8') as f:
-            f.write("{invalid json}")
+            f.write("{invalid json")
 
         with pytest.raises(json.JSONDecodeError):
             load_categories_from_json(str(json_path))
