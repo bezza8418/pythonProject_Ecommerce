@@ -2,7 +2,7 @@
 Модуль для работы с товарами интернет-магазина.
 """
 
-from typing import Union
+from typing import Dict, List, Optional, Union
 
 
 class Product:
@@ -20,5 +20,67 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.price = float(price)  # Приводим к float для единообразия
+        self.__price = float(price)  # Приводим к float для единообразия
         self.quantity = quantity
+
+    @property
+    def price(self) -> float:
+        """Геттер для цены."""
+        return self.__price
+
+    @price.setter
+    def price(self, value: Union[float, int]) -> None:
+        """
+        Сеттер для цены с проверкой на положительное значение.
+
+        Args:
+            value: Новое значение цены
+        """
+        if value <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+        else:
+            self.__price = float(value)
+
+    @classmethod
+    def new_product(cls, product_data: Dict[str, Union[str, float, int]],
+                   existing_products: Optional[List['Product']] = None) -> 'Product':
+        """
+        Класс-метод для создания нового продукта из словаря.
+
+        Args:
+            product_data: Словарь с данными о продукте
+            existing_products: Список существующих продуктов для проверки дубликатов
+
+        Returns:
+            Новый экземпляр класса Product
+        """
+        name = product_data.get('name', '')
+        description = product_data.get('description', '')
+        price = product_data.get('price', 0.0)
+        quantity = product_data.get('quantity', 0)
+
+        # Проверка на дубликаты (дополнительное задание)
+        if existing_products:
+            for existing in existing_products:
+                if existing.name == name:
+                    # Если товар уже существует, складываем количество
+                    # и берем максимальную цену
+                    quantity += existing.quantity
+                    price = max(float(price), existing.price)
+                    # Удаляем старый товар из списка (будет заменен новым)
+                    existing_products.remove(existing)
+                    break
+
+        return cls(name, description, price, quantity)
+
+    @classmethod
+    def new_product_simple(cls, product_data: Dict[str, Union[str, float, int]]) -> 'Product':
+        """
+        Упрощенная версия класс-метода без проверки дубликатов.
+        """
+        return cls(
+            name=product_data.get('name', ''),
+            description=product_data.get('description', ''),
+            price=product_data.get('price', 0.0),
+            quantity=product_data.get('quantity', 0)
+        )
