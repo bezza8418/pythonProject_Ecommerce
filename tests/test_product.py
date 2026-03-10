@@ -154,3 +154,45 @@ class TestProductNewProduct:
 
         assert product.price == 50.0  # Взяли максимальную цену
         assert product.quantity == 7
+
+
+class TestProductPriceConfirmation:
+    """Тесты для подтверждения понижения цены."""
+
+    def test_price_decrease_confirmed(self, monkeypatch, capsys):
+        """Тест понижения цены с подтверждением."""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        # Имитируем ввод 'y'
+        monkeypatch.setattr('builtins.input', lambda _: 'y')
+
+        product.price = 80.0
+        captured = capsys.readouterr()
+
+        assert product.price == 80.0
+        assert "понизить цену" in captured.out
+        assert "Цена успешно изменена" in captured.out
+
+    def test_price_decrease_cancelled(self, monkeypatch, capsys):
+        """Тест понижения цены с отменой."""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        # Имитируем ввод 'n'
+        monkeypatch.setattr('builtins.input', lambda _: 'n')
+
+        product.price = 80.0
+        captured = capsys.readouterr()
+
+        assert product.price == 100.0  # Цена не изменилась
+        assert "понизить цену" in captured.out
+        assert "Изменение цены отменено" in captured.out
+
+    def test_price_increase_no_confirmation(self, capsys):
+        """Тест повышения цены (без подтверждения)."""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        product.price = 120.0
+        captured = capsys.readouterr()
+
+        assert product.price == 120.0
+        assert "понизить цену" not in captured.out

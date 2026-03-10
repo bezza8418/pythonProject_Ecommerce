@@ -84,3 +84,29 @@ class Product:
             price=product_data.get('price', 0.0),
             quantity=product_data.get('quantity', 0)
         )
+
+    @price.setter
+    def price(self, value: Union[float, int]) -> None:
+        """
+        Сеттер для цены с проверкой на положительное значение
+        и подтверждением при понижении цены.
+
+        Args:
+            value: Новое значение цены
+        """
+        if value <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+            return
+
+        # Проверка на понижение цены
+        if value < self.__price:
+            print(f"Вы确实 собираетесь понизить цену с {self.__price} до {value}?")
+            answer = input("Подтвердите действие (y/n): ").strip().lower()
+
+            if answer == 'y':
+                self.__price = float(value)
+                print("Цена успешно изменена")
+            else:
+                print("Изменение цены отменено")
+        else:
+            self.__price = float(value)
