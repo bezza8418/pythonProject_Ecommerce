@@ -10,6 +10,10 @@
 - ✅ Автоматический подсчет количества категорий и товаров
 - ✅ Загрузка данных из JSON-файла
 - ✅ Сохранение данных в JSON-файл
+- ✅ Приватные атрибуты для защиты данных (`__products`, `__price`)
+- ✅ Геттеры и сеттеры с валидацией
+- ✅ Класс-метод для создания товаров из словаря
+- ✅ Подтверждение при понижении цены
 
 ## 🚀 Установка
 
@@ -25,7 +29,8 @@ poetry install
 ```
 
 ## 📚 Использование
-Создание товаров и категорий вручную:
+### Базовые операции:
+- Создание товаров и категорий вручную:
 ```python
 from src.product import Product
 from src.category import Category
@@ -39,7 +44,7 @@ product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
 category = Category("Смартфоны", "Описание категории", [product1, product2])
 ```
 
-Загрузка из JSON:
+- Загрузка из JSON:
 ```python
 from src.utils import load_categories_from_json
 
@@ -48,7 +53,7 @@ for category in categories:
     print(f"{category.name}: {len(category.products)} товаров")
 ```
 
-Сохранение в JSON:
+- Сохранение в JSON:
 ```python
 from src.utils import load_categories_from_json, save_categories_to_json
 
@@ -57,7 +62,49 @@ categories = load_categories_from_json("data/products.json")
 save_categories_to_json(categories, "data/new_products.json")
 ```
 
-Запуск демонстрации:
+### 🆕 Новые возможности (версия 2.0)
+Защита данных:
+- Атрибут products в классе Category теперь приватный (__products)
+- Атрибут price в классе Product теперь приватный (__price)
+
+Добавление товаров в категорию:
+```python
+# Товары добавляются через специальный метод
+category.add_product(new_product)
+```
+
+Просмотр товаров через геттер
+```python
+# Геттер возвращает красиво отформатированную строку
+print(category.products)
+# Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт.
+# Iphone 15, 210000.0 руб. Остаток: 8 шт.
+```
+
+Создание товаров из словаря
+```python
+data = {
+    "name": "Samsung Galaxy S23 Ultra",
+    "description": "256GB, Серый цвет, 200MP камера",
+    "price": 180000.0,
+    "quantity": 5
+}
+product = Product.new_product(data)
+
+# При наличии дубликатов происходит объединение
+existing_products = [product1, product2]
+product = Product.new_product(data, existing_products)
+# Количество складывается, цена выбирается максимальная
+```
+
+Безопасное изменение цены
+```python
+product.price = 200000.0  # Повышение цены без подтверждения
+product.price = 150000.0  # Понижение цены требует подтверждения
+# Вы действительно хотите понизить цену? (y/n)
+```
+
+### Запуск демонстрации:
 ```bash
 poetry run python main.py
 ```
@@ -78,14 +125,14 @@ poetry run pytest --cov=src --cov-report=html
 ```
 
 ## 📊 Покрытие тестами
-### Статистика покрытия (100%)
-| Модуль        | Строк  | Пропущено | Покрытие |
-|---------------|--------|-----------|----------|
-| `__init__.py` | 4      | 0         | 100%     |
-| `category.py` | 11     | 0         | 100%     |
-| `product.py`  | 7      | 0         | 100%     |
-| `utils.py`    | 23     | 0         | 100%     |
-| **ИТОГО**     | **45** | **0**     | **100%** |
+### Статистика покрытия (90%)
+| Модуль        | Строк   | Пропущено | Покрытие |
+|---------------|---------|-----------|----------|
+| `__init__.py` | 4       | 0         | 100%     |
+| `category.py` | 25      | 0         | 100%     |
+| `product.py`  | 45      | 3         | 93%      |
+| `utils.py`    | 51      | 9         | 82%      |
+| **ИТОГО**     | **125** | **12**    | **90%**  |
 
 Просмотр отчета:
 
