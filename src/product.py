@@ -8,7 +8,9 @@ from typing import Dict, List, Optional, Union
 class Product:
     """Класс для представления товара."""
 
-    def __init__(self, name: str, description: str, price: Union[float, int], quantity: int) -> None:
+    def __init__(
+        self, name: str, description: str, price: Union[float, int], quantity: int
+    ) -> None:
         """
         Инициализация товара.
 
@@ -46,7 +48,7 @@ class Product:
             print(f"Вы действительно хотите понизить цену с {self.__price} до {value}?")
             answer = input("Подтвердите действие (y/n): ").strip().lower()
 
-            if answer == 'y':
+            if answer == "y":
                 self.__price = float(value)
                 print("Цена успешно изменена")
             else:
@@ -61,7 +63,7 @@ class Product:
         """
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
-    def __add__(self, other: 'Product') -> float:
+    def __add__(self, other: "Product") -> float:
         """
         Складывает стоимость всех товаров на складе двух продуктов.
         Результат: цена1 * количество1 + цена2 * количество2
@@ -72,8 +74,11 @@ class Product:
         return self.price * self.quantity + other.price * other.quantity
 
     @classmethod
-    def new_product(cls, product_data: Dict[str, Union[str, float, int]],
-                    existing_products: Optional[List['Product']] = None) -> 'Product':
+    def new_product(
+        cls,
+        product_data: Dict[str, Union[str, float, int]],
+        existing_products: Optional[List["Product"]] = None,
+    ) -> "Product":
         """
         Класс-метод для создания нового продукта из словаря.
 
@@ -85,11 +90,11 @@ class Product:
             Новый экземпляр класса Product
         """
         # Получаем значения из словаря с правильными типами
-        name = str(product_data.get('name', ''))
-        description = str(product_data.get('description', ''))
+        name = str(product_data.get("name", ""))
+        description = str(product_data.get("description", ""))
 
         # Обрабатываем цену
-        price_value = product_data.get('price', 0)
+        price_value = product_data.get("price", 0)
         if isinstance(price_value, str):
             try:
                 price = float(price_value)
@@ -99,7 +104,7 @@ class Product:
             price = float(price_value)
 
         # Обрабатываем количество
-        quantity_value = product_data.get('quantity', 0)
+        quantity_value = product_data.get("quantity", 0)
         if isinstance(quantity_value, str):
             try:
                 quantity = int(quantity_value)
@@ -123,15 +128,17 @@ class Product:
         return cls(name, description, price, quantity)
 
     @classmethod
-    def new_product_simple(cls, product_data: Dict[str, Union[str, float, int]]) -> 'Product':
+    def new_product_simple(
+        cls, product_data: Dict[str, Union[str, float, int]]
+    ) -> "Product":
         """
         Упрощенная версия класс-метода без проверки дубликатов.
         """
-        name = str(product_data.get('name', ''))
-        description = str(product_data.get('description', ''))
+        name = str(product_data.get("name", ""))
+        description = str(product_data.get("description", ""))
 
         # Обрабатываем цену
-        price_value = product_data.get('price', 0)
+        price_value = product_data.get("price", 0)
         if isinstance(price_value, str):
             try:
                 price = float(price_value)
@@ -141,7 +148,7 @@ class Product:
             price = float(price_value)
 
         # Обрабатываем количество
-        quantity_value = product_data.get('quantity', 0)
+        quantity_value = product_data.get("quantity", 0)
         if isinstance(quantity_value, str):
             try:
                 quantity = int(quantity_value)

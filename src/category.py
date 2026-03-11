@@ -2,7 +2,7 @@
 Модуль для работы с категориями товаров интернет-магазина.
 """
 
-from typing import List, Optional, Iterator
+from typing import Iterator, List, Optional
 
 from src.product import Product
 
@@ -10,7 +10,7 @@ from src.product import Product
 class CategoryIterator:
     """Итератор для перебора товаров в категории."""
 
-    def __init__(self, category: 'Category') -> None:
+    def __init__(self, category: "Category") -> None:
         """
         Инициализация итератора.
 
@@ -43,7 +43,9 @@ class Category:
     category_count: int = 0
     product_count: int = 0
 
-    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
+    def __init__(
+        self, name: str, description: str, products: Optional[List[Product]] = None
+    ) -> None:
         """
         Инициализация категории.
 

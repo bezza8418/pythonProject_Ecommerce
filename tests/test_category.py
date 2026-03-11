@@ -277,7 +277,7 @@ class TestCategoryMagicMethods:
 
         assert initial_str != new_str
         assert "27 шт." in initial_str  # Было 27
-        assert "32 шт." in new_str      # Стало 27 + 5 = 32
+        assert "32 шт." in new_str  # Стало 27 + 5 = 32
 
 
 class TestCategoryIterator:

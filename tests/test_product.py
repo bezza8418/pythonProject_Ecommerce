@@ -206,10 +206,10 @@ class TestProductEdgeCases:
     def test_new_product_with_string_price(self):
         """Тест создания продукта с ценой в виде строки."""
         data = {
-            'name': 'Test Product',
-            'description': 'Test Description',
-            'price': '99.99',
-            'quantity': '10'
+            "name": "Test Product",
+            "description": "Test Description",
+            "price": "99.99",
+            "quantity": "10",
         }
 
         product = Product.new_product_simple(data)
@@ -220,10 +220,10 @@ class TestProductEdgeCases:
     def test_new_product_with_invalid_string_price(self):
         """Тест создания продукта с некорректной строкой цены."""
         data = {
-            'name': 'Test Product',
-            'description': 'Test Description',
-            'price': 'invalid',
-            'quantity': 'invalid'
+            "name": "Test Product",
+            "description": "Test Description",
+            "price": "invalid",
+            "quantity": "invalid",
         }
 
         product = Product.new_product_simple(data)
@@ -237,7 +237,9 @@ class TestProductMagicMethods:
 
     def test_product_str(self):
         """Тест строкового представления товара."""
-        product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+        product = Product(
+            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+        )
         expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
         assert str(product) == expected
 
@@ -255,7 +257,9 @@ class TestProductMagicMethods:
         """Тест сложения товара с не-товаром."""
         product = Product("Product", "Desc", 100.0, 5)
 
-        with pytest.raises(TypeError, match="Можно складывать только с объектами класса Product"):
+        with pytest.raises(
+            TypeError, match="Можно складывать только с объектами класса Product"
+        ):
             product + 100
 
     def test_product_add_with_self(self):
