@@ -2,9 +2,38 @@
 Модуль для работы с категориями товаров интернет-магазина.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Iterator
 
 from src.product import Product
+
+
+class CategoryIterator:
+    """Итератор для перебора товаров в категории."""
+
+    def __init__(self, category: 'Category') -> None:
+        """
+        Инициализация итератора.
+
+        Args:
+            category: Объект категории, товары которой нужно перебирать
+        """
+        self._products = category.products_list
+        self._index = 0
+
+    def __iter__(self) -> Iterator[Product]:
+        """Возвращает итератор."""
+        return self
+
+    def __next__(self) -> Product:
+        """
+        Возвращает следующий товар или бросает StopIteration.
+        """
+        if self._index >= len(self._products):
+            raise StopIteration
+
+        product = self._products[self._index]
+        self._index += 1
+        return product
 
 
 class Category:
@@ -14,9 +43,7 @@ class Category:
     category_count: int = 0
     product_count: int = 0
 
-    def __init__(
-        self, name: str, description: str, products: Optional[List[Product]] = None
-    ) -> None:
+    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
         """
         Инициализация категории.
 
@@ -47,10 +74,17 @@ class Category:
 
         result = []
         for product in self.__products:
-            result.append(
-                f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт."
-            )
+            # Используем __str__ продукта для форматирования
+            result.append(str(product))
         return "\n".join(result) + ("\n" if result else "")
+
+    @property
+    def products_list(self) -> List[Product]:
+        """
+        Дополнительный геттер для получения списка объектов Product.
+        Нужен для тестирования и внутренних операций.
+        """
+        return self.__products.copy()
 
     def add_product(self, product: Product) -> None:
         """
@@ -62,10 +96,15 @@ class Category:
         self.__products.append(product)
         Category.product_count += 1
 
-    @property
-    def products_list(self) -> List[Product]:
+    def __str__(self) -> str:
         """
-        Дополнительный геттер для получения списка объектов Product.
-        Нужен для тестирования и внутренних операций.
+        Возвращает строковое представление категории.
+        Формат: "Название категории, количество продуктов: X шт."
+        Количество продуктов считается как сумма quantity всех товаров в категории.
         """
-        return self.__products.copy()
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
+    def __iter__(self):
+        """Возвращает итератор для перебора товаров категории."""
+        return CategoryIterator(self)

@@ -54,6 +54,23 @@ class Product:
         else:
             self.__price = float(value)
 
+    def __str__(self) -> str:
+        """
+        Возвращает строковое представление товара.
+        Формат: "Название продукта, X руб. Остаток: X шт."
+        """
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: 'Product') -> float:
+        """
+        Складывает стоимость всех товаров на складе двух продуктов.
+        Результат: цена1 * количество1 + цена2 * количество2
+        """
+        if not isinstance(other, Product):
+            raise TypeError("Можно складывать только с объектами класса Product")
+
+        return self.price * self.quantity + other.price * other.quantity
+
     @classmethod
     def new_product(cls, product_data: Dict[str, Union[str, float, int]],
                     existing_products: Optional[List['Product']] = None) -> 'Product':

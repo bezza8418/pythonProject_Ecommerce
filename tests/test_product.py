@@ -2,6 +2,8 @@
 Тесты для модуля product.
 """
 
+import pytest
+
 from src.product import Product
 
 
@@ -228,3 +230,39 @@ class TestProductEdgeCases:
 
         assert product.price == 0.0  # Должно стать 0
         assert product.quantity == 0  # Должно стать 0
+
+
+class TestProductMagicMethods:
+    """Тесты для магических методов класса Product."""
+
+    def test_product_str(self):
+        """Тест строкового представления товара."""
+        product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+        expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+        assert str(product) == expected
+
+    def test_product_add(self):
+        """Тест сложения двух товаров."""
+        product1 = Product("Product 1", "Desc 1", 100.0, 10)
+        product2 = Product("Product 2", "Desc 2", 200.0, 2)
+
+        result = product1 + product2
+        expected = 100 * 10 + 200 * 2  # 1000 + 400 = 1400
+
+        assert result == expected
+
+    def test_product_add_with_non_product(self):
+        """Тест сложения товара с не-товаром."""
+        product = Product("Product", "Desc", 100.0, 5)
+
+        with pytest.raises(TypeError, match="Можно складывать только с объектами класса Product"):
+            product + 100
+
+    def test_product_add_with_self(self):
+        """Тест сложения товара с самим собой."""
+        product = Product("Product", "Desc", 100.0, 5)
+
+        result = product + product
+        expected = 100 * 5 + 100 * 5  # 500 + 500 = 1000
+
+        assert result == expected
