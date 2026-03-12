@@ -93,8 +93,16 @@ class Category:
         Добавляет товар в категорию.
 
         Args:
-            product: Объект класса Product для добавления
+            product: Объект класса Product или его наследников для добавления
+
+        Raises:
+            TypeError: Если передан не объект класса Product или его наследников
         """
+        if not isinstance(product, Product):
+            raise TypeError(
+                "Можно добавлять только объекты класса Product или его наследников"
+            )
+
         self.__products.append(product)
         Category.product_count += 1
 

@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Union
 
 
 class Product:
-    """Класс для представления товара."""
+    """Базовый класс для представления товара."""
 
     def __init__(
         self, name: str, description: str, price: Union[float, int], quantity: int
@@ -70,6 +70,10 @@ class Product:
         """
         if not isinstance(other, Product):
             raise TypeError("Можно складывать только с объектами класса Product")
+
+        # Проверка на одинаковые классы
+        if type(self) is not type(other):
+            raise TypeError("Нельзя складывать товары разных классов")
 
         return self.price * self.quantity + other.price * other.quantity
 
@@ -158,3 +162,68 @@ class Product:
             quantity = int(quantity_value)
 
         return cls(name, description, price, quantity)
+
+
+class Smartphone(Product):
+    """Класс для представления смартфона."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: Union[float, int],
+        quantity: int,
+        efficiency: str,
+        model: str,
+        memory: int,
+        color: str,
+    ) -> None:
+        """
+        Инициализация смартфона.
+
+        Args:
+            name: Название
+            description: Описание
+            price: Цена
+            quantity: Количество
+            efficiency: Производительность
+            model: Модель
+            memory: Объем встроенной памяти
+            color: Цвет
+        """
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    """Класс для представления газонной травы."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: Union[float, int],
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ) -> None:
+        """
+        Инициализация газонной травы.
+
+        Args:
+            name: Название
+            description: Описание
+            price: Цена
+            quantity: Количество
+            country: Страна-производитель
+            germination_period: Срок прорастания
+            color: Цвет
+        """
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color

@@ -7,7 +7,7 @@ import json
 import pytest
 
 from src.category import Category
-from src.product import Product
+from src.product import LawnGrass, Product, Smartphone
 from src.utils import load_categories_from_json
 
 
@@ -54,7 +54,7 @@ class TestCategory:
         assert category.name == "Пустая категория"
         assert category.description == "Описание"
         assert len(category.products_list) == 0
-        assert category.products == ""  # Пустая строка для геттера
+        assert category.products == ""
 
     def test_category_with_single_product(self, sample_products):
         """Тест категории с одним товаром."""
@@ -70,8 +70,9 @@ class TestCategoryPrivate:
 
     def test_products_private(self, sample_category):
         """Тест, что атрибут products действительно приватный."""
+        # Проверяем, что прямой доступ к __products вызывает ошибку
         with pytest.raises(AttributeError):
-            sample_category.__products
+            _ = sample_category.__products
 
     def test_products_getter_format(self, sample_category):
         """Тест формата геттера products."""
@@ -137,6 +138,9 @@ class TestCategoryCounters:
 
     def test_category_count_increases(self):
         """Тест увеличения счетчика категорий."""
+        Category.category_count = 0
+        Category.product_count = 0
+
         Category("Категория 1", "Описание 1")
         assert Category.category_count == 1
 
@@ -145,6 +149,9 @@ class TestCategoryCounters:
 
     def test_product_count_increases_with_initial_products(self, sample_products):
         """Тест увеличения счетчика товаров при создании категории."""
+        Category.category_count = 0
+        Category.product_count = 0
+
         Category("Категория 1", "Описание 1", sample_products[:2])
         assert Category.product_count == 2
 
@@ -153,6 +160,9 @@ class TestCategoryCounters:
 
     def test_product_count_increases_with_add_product(self, sample_products):
         """Тест увеличения счетчика товаров при добавлении."""
+        Category.category_count = 0
+        Category.product_count = 0
+
         category = Category("Категория", "Описание")
         assert Category.product_count == 0
 
@@ -173,6 +183,105 @@ class TestCategoryCounters:
 
         assert Category.category_count == 3
         assert Category.product_count == 3  # 2 + 1 + 0
+
+
+class TestCategoryAddProductRestrictions:
+    """Тесты для ограничений добавления продуктов в категорию."""
+
+    def test_add_product_to_category(self, sample_category):
+        """Тест добавления обычного продукта."""
+        product = Product("Test", "Desc", 100.0, 5)
+        sample_category.add_product(product)
+        assert len(sample_category.products_list) > 0
+
+    def test_add_smartphone_to_category(self, sample_category):
+        """Тест добавления смартфона в категорию."""
+        phone = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB",
+            180000.0,
+            5,
+            "Snapdragon",
+            "SM-S918B",
+            256,
+            "Серый",
+        )
+        sample_category.add_product(phone)
+        assert len(sample_category.products_list) > 0
+        assert isinstance(sample_category.products_list[-1], Smartphone)
+
+    def test_add_lawn_grass_to_category(self, sample_category):
+        """Тест добавления газонной травы в категорию."""
+        grass = LawnGrass(
+            "Газон 'Изумрудный'", "Семена", 500.0, 10, "Россия", "7-10 дней", "Зеленый"
+        )
+        sample_category.add_product(grass)
+        assert len(sample_category.products_list) > 0
+        assert isinstance(sample_category.products_list[-1], LawnGrass)
+
+    def test_add_non_product_to_category(self, sample_category):
+        """Тест добавления не-продукта в категорию."""
+        with pytest.raises(
+            TypeError, match="Можно добавлять только объекты класса Product"
+        ):
+            sample_category.add_product("not a product")  # type: ignore
+
+
+class TestCategoryMagicMethods:
+    """Тесты для магических методов класса Category."""
+
+    def test_category_str(self, sample_category):
+        """Тест строкового представления категории."""
+        # 5 + 8 + 14 = 27
+        expected = "Смартфоны, количество продуктов: 27 шт."
+        assert str(sample_category) == expected
+
+    def test_category_str_empty(self):
+        """Тест строкового представления пустой категории."""
+        category = Category("Пустая категория", "Описание", [])
+        expected = "Пустая категория, количество продуктов: 0 шт."
+        assert str(category) == expected
+
+    def test_category_str_after_add_product(self, sample_category, sample_products):
+        """Тест строкового представления после добавления товара."""
+        initial_str = str(sample_category)
+        sample_category.add_product(sample_products[0])
+        new_str = str(sample_category)
+
+        assert initial_str != new_str
+        assert "27 шт." in initial_str  # Было 27
+        assert "32 шт." in new_str  # Стало 27 + 5 = 32
+
+
+class TestCategoryIterator:
+    """Тесты для итератора категории."""
+
+    def test_category_iteration(self, sample_category):
+        """Тест перебора товаров в категории."""
+        products_list = []
+        for product in sample_category:
+            products_list.append(product)
+
+        assert len(products_list) == 3
+        assert products_list[0].name == "Samsung Galaxy S23 Ultra"
+        assert products_list[1].name == "Iphone 15"
+        assert products_list[2].name == "Xiaomi Redmi Note 11"
+
+    def test_category_iteration_empty(self):
+        """Тест перебора в пустой категории."""
+        category = Category("Пустая", "Описание", [])
+        products_list = [p for p in category]
+
+        assert products_list == []
+
+    def test_category_iteration_after_add(self, sample_category, sample_products):
+        """Тест перебора после добавления товара."""
+        initial_count = len([p for p in sample_category])
+
+        sample_category.add_product(sample_products[0])
+        new_count = len([p for p in sample_category])
+
+        assert new_count == initial_count + 1
 
 
 class TestCategoryUtils:
@@ -252,60 +361,3 @@ class TestCategoryUtils:
 
         with pytest.raises(json.JSONDecodeError):
             load_categories_from_json(str(json_path))
-
-
-class TestCategoryMagicMethods:
-    """Тесты для магических методов класса Category."""
-
-    def test_category_str(self, sample_category, sample_products):
-        """Тест строкового представления категории."""
-        # sample_products: [Samsung(5), Iphone(8), Xiaomi(14)]
-        expected = "Смартфоны, количество продуктов: 27 шт."  # 5 + 8 + 14 = 27
-        assert str(sample_category) == expected
-
-    def test_category_str_empty(self):
-        """Тест строкового представления пустой категории."""
-        category = Category("Пустая категория", "Описание", [])
-        expected = "Пустая категория, количество продуктов: 0 шт."
-        assert str(category) == expected
-
-    def test_category_str_after_add_product(self, sample_category, sample_products):
-        """Тест строкового представления после добавления товара."""
-        initial_str = str(sample_category)
-        sample_category.add_product(sample_products[0])
-        new_str = str(sample_category)
-
-        assert initial_str != new_str
-        assert "27 шт." in initial_str  # Было 27
-        assert "32 шт." in new_str  # Стало 27 + 5 = 32
-
-
-class TestCategoryIterator:
-    """Тесты для итератора категории."""
-
-    def test_category_iteration(self, sample_category, sample_products):
-        """Тест перебора товаров в категории."""
-        products_list = []
-        for product in sample_category:
-            products_list.append(product)
-
-        assert len(products_list) == 3
-        assert products_list[0].name == "Samsung Galaxy S23 Ultra"
-        assert products_list[1].name == "Iphone 15"
-        assert products_list[2].name == "Xiaomi Redmi Note 11"
-
-    def test_category_iteration_empty(self):
-        """Тест перебора в пустой категории."""
-        category = Category("Пустая", "Описание", [])
-        products_list = [p for p in category]
-
-        assert products_list == []
-
-    def test_category_iteration_after_add(self, sample_category, sample_products):
-        """Тест перебора после добавления товара."""
-        initial_count = len([p for p in sample_category])
-
-        sample_category.add_product(sample_products[0])
-        new_count = len([p for p in sample_category])
-
-        assert new_count == initial_count + 1

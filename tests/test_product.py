@@ -4,7 +4,7 @@
 
 import pytest
 
-from src.product import Product
+from src.product import LawnGrass, Product, Smartphone
 
 
 class TestProduct:
@@ -77,6 +77,166 @@ class TestProductPrice:
         captured = capsys.readouterr()
         assert product.price == 100.0  # Цена не изменилась
         assert "Цена не должна быть нулевая или отрицательная" in captured.out
+
+
+class TestProductMagicMethods:
+    """Тесты для магических методов класса Product."""
+
+    def test_product_str(self):
+        """Тест строкового представления товара."""
+        product = Product(
+            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+        )
+        expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+        assert str(product) == expected
+
+    def test_product_add(self):
+        """Тест сложения двух товаров."""
+        product1 = Product("Product 1", "Desc 1", 100.0, 10)
+        product2 = Product("Product 2", "Desc 2", 200.0, 2)
+
+        result = product1 + product2
+        expected = 100 * 10 + 200 * 2  # 1000 + 400 = 1400
+
+        assert result == expected
+
+    def test_product_add_with_non_product(self):
+        """Тест сложения товара с не-товаром."""
+        product = Product("Product", "Desc", 100.0, 5)
+
+        with pytest.raises(
+            TypeError, match="Можно складывать только с объектами класса Product"
+        ):
+            product + 100  # noqa
+
+    def test_product_add_with_self(self):
+        """Тест сложения товара с самим собой."""
+        product = Product("Product", "Desc", 100.0, 5)
+
+        result = product + product
+        expected = 100 * 5 + 100 * 5  # 500 + 500 = 1000
+
+        assert result == expected
+
+
+class TestSmartphone:
+    """Тесты для класса Smartphone."""
+
+    def test_smartphone_creation(self):
+        """Тест создания смартфона."""
+        phone = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB, Серый цвет, 200MP камера",
+            180000.0,
+            5,
+            "Snapdragon 8 Gen 2",
+            "SM-S918B",
+            256,
+            "Серый",
+        )
+
+        assert phone.name == "Samsung Galaxy S23 Ultra"
+        assert phone.price == 180000.0
+        assert phone.quantity == 5
+        assert phone.efficiency == "Snapdragon 8 Gen 2"
+        assert phone.model == "SM-S918B"
+        assert phone.memory == 256
+        assert phone.color == "Серый"
+
+    def test_smartphone_str(self):
+        """Тест строкового представления смартфона."""
+        phone = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB, Серый цвет, 200MP камера",
+            180000.0,
+            5,
+            "Snapdragon 8 Gen 2",
+            "SM-S918B",
+            256,
+            "Серый",
+        )
+        expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+        assert str(phone) == expected
+
+
+class TestLawnGrass:
+    """Тесты для класса LawnGrass."""
+
+    def test_lawn_grass_creation(self):
+        """Тест создания газонной травы."""
+        grass = LawnGrass(
+            "Газон 'Изумрудный'",
+            "Семена газонной травы",
+            500.0,
+            10,
+            "Россия",
+            "7-10 дней",
+            "Зеленый",
+        )
+
+        assert grass.name == "Газон 'Изумрудный'"
+        assert grass.price == 500.0
+        assert grass.quantity == 10
+        assert grass.country == "Россия"
+        assert grass.germination_period == "7-10 дней"
+        assert grass.color == "Зеленый"
+
+    def test_lawn_grass_str(self):
+        """Тест строкового представления газонной травы."""
+        grass = LawnGrass(
+            "Газон 'Изумрудный'",
+            "Семена газонной травы",
+            500.0,
+            10,
+            "Россия",
+            "7-10 дней",
+            "Зеленый",
+        )
+        expected = "Газон 'Изумрудный', 500.0 руб. Остаток: 10 шт."
+        assert str(grass) == expected
+
+
+class TestProductAdditionRestrictions:
+    """Тесты для ограничений сложения."""
+
+    def test_add_same_classes(self):
+        """Тест сложения объектов одного класса."""
+        phone1 = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB",
+            180000.0,
+            5,
+            "Snapdragon",
+            "SM-S918B",
+            256,
+            "Серый",
+        )
+        phone2 = Smartphone(
+            "Iphone 15", "512GB", 210000.0, 8, "A16", "A3090", 512, "Black"
+        )
+
+        result = phone1 + phone2
+        expected = 180000 * 5 + 210000 * 8  # 900000 + 1680000 = 2580000
+        assert result == expected
+
+    def test_add_different_classes(self):
+        """Тест сложения объектов разных классов."""
+        phone = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB",
+            180000.0,
+            5,
+            "Snapdragon",
+            "SM-S918B",
+            256,
+            "Серый",
+        )
+        grass = LawnGrass(
+            "Газон 'Изумрудный'", "Семена", 500.0, 10, "Россия", "7-10 дней", "Зеленый"
+        )
+
+        with pytest.raises(TypeError, match="Нельзя складывать товары разных классов"):
+            phone + grass  # noqa
 
 
 class TestProductNewProduct:
@@ -231,42 +391,22 @@ class TestProductEdgeCases:
         assert product.price == 0.0  # Должно стать 0
         assert product.quantity == 0  # Должно стать 0
 
+    def test_new_product_with_dict_contains_all_types(self):
+        """Тест new_product со сложным словарем."""
+        product1 = Product("Product 1", "Desc 1", 100.0, 2)
+        product2 = Product("Product 2", "Desc 2", 200.0, 3)
 
-class TestProductMagicMethods:
-    """Тесты для магических методов класса Product."""
+        data = {
+            "name": "Duplicate Product",
+            "description": "New Description",
+            "price": 50.0,
+            "quantity": 5,
+        }
 
-    def test_product_str(self):
-        """Тест строкового представления товара."""
-        product = Product(
-            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
-        )
-        expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
-        assert str(product) == expected
+        existing = [product1, product2]
 
-    def test_product_add(self):
-        """Тест сложения двух товаров."""
-        product1 = Product("Product 1", "Desc 1", 100.0, 10)
-        product2 = Product("Product 2", "Desc 2", 200.0, 2)
+        product = Product.new_product(data, existing)
 
-        result = product1 + product2
-        expected = 100 * 10 + 200 * 2  # 1000 + 400 = 1400
-
-        assert result == expected
-
-    def test_product_add_with_non_product(self):
-        """Тест сложения товара с не-товаром."""
-        product = Product("Product", "Desc", 100.0, 5)
-
-        with pytest.raises(
-            TypeError, match="Можно складывать только с объектами класса Product"
-        ):
-            product + 100
-
-    def test_product_add_with_self(self):
-        """Тест сложения товара с самим собой."""
-        product = Product("Product", "Desc", 100.0, 5)
-
-        result = product + product
-        expected = 100 * 5 + 100 * 5  # 500 + 500 = 1000
-
-        assert result == expected
+        assert product.name == "Duplicate Product"
+        assert product.price == 50.0
+        assert product.quantity == 5
