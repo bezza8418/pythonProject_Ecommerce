@@ -4,8 +4,11 @@
 
 from typing import Dict, List, Optional, Union
 
+from src.base_product import BaseProduct
+from src.mixins import CreationMixin
 
-class Product:
+
+class Product(CreationMixin, BaseProduct):
     """Базовый класс для представления товара."""
 
     def __init__(
@@ -22,8 +25,13 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.__price = float(price)  # Приводим к float для единообразия
+        self.__price = float(price)
         self.quantity = quantity
+        super().__init__(name, description, price, quantity)
+
+    def _get_params(self) -> str:
+        """Возвращает параметры для логирования создания."""
+        return f"('{self.name}', '{self.description}', {self.__price}, {self.quantity})"
 
     @property
     def price(self) -> float:
@@ -63,7 +71,7 @@ class Product:
         """
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
-    def __add__(self, other: "Product") -> float:
+    def __add__(self, other: "BaseProduct") -> float:
         """
         Складывает стоимость всех товаров на складе двух продуктов.
         Результат: цена1 * количество1 + цена2 * количество2
@@ -93,39 +101,19 @@ class Product:
         Returns:
             Новый экземпляр класса Product
         """
-        # Получаем значения из словаря с правильными типами
         name = str(product_data.get("name", ""))
         description = str(product_data.get("description", ""))
-
-        # Обрабатываем цену
         price_value = product_data.get("price", 0)
-        if isinstance(price_value, str):
-            try:
-                price = float(price_value)
-            except ValueError:
-                price = 0.0
-        else:
-            price = float(price_value)
-
-        # Обрабатываем количество
         quantity_value = product_data.get("quantity", 0)
-        if isinstance(quantity_value, str):
-            try:
-                quantity = int(quantity_value)
-            except ValueError:
-                quantity = 0
-        else:
-            quantity = int(quantity_value)
 
-        # Проверка на дубликаты (дополнительное задание)
+        price = float(price_value) if price_value else 0.0
+        quantity = int(quantity_value) if quantity_value else 0
+
         if existing_products:
             for existing in existing_products:
                 if existing.name == name:
-                    # Если товар уже существует, складываем количество
-                    # и берем максимальную цену
                     quantity += existing.quantity
                     price = max(price, existing.price)
-                    # Удаляем старый товар из списка (будет заменен новым)
                     existing_products.remove(existing)
                     break
 
@@ -141,7 +129,6 @@ class Product:
         name = str(product_data.get("name", ""))
         description = str(product_data.get("description", ""))
 
-        # Обрабатываем цену
         price_value = product_data.get("price", 0)
         if isinstance(price_value, str):
             try:
@@ -151,7 +138,6 @@ class Product:
         else:
             price = float(price_value)
 
-        # Обрабатываем количество
         quantity_value = product_data.get("quantity", 0)
         if isinstance(quantity_value, str):
             try:
@@ -180,22 +166,19 @@ class Smartphone(Product):
     ) -> None:
         """
         Инициализация смартфона.
-
-        Args:
-            name: Название
-            description: Описание
-            price: Цена
-            quantity: Количество
-            efficiency: Производительность
-            model: Модель
-            memory: Объем встроенной памяти
-            color: Цвет
         """
-        super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
         self.memory = memory
         self.color = color
+        super().__init__(name, description, price, quantity)
+
+    def _get_params(self) -> str:
+        """Возвращает параметры для логирования создания."""
+        return (
+            f"('{self.name}', '{self.description}', {self.price}, {self.quantity}, "
+            f"'{self.efficiency}', '{self.model}', {self.memory}, '{self.color}')"
+        )
 
 
 class LawnGrass(Product):
@@ -213,17 +196,15 @@ class LawnGrass(Product):
     ) -> None:
         """
         Инициализация газонной травы.
-
-        Args:
-            name: Название
-            description: Описание
-            price: Цена
-            quantity: Количество
-            country: Страна-производитель
-            germination_period: Срок прорастания
-            color: Цвет
         """
-        super().__init__(name, description, price, quantity)
         self.country = country
         self.germination_period = germination_period
         self.color = color
+        super().__init__(name, description, price, quantity)
+
+    def _get_params(self) -> str:
+        """Возвращает параметры для логирования создания."""
+        return (
+            f"('{self.name}', '{self.description}', {self.price}, {self.quantity}, "
+            f"'{self.country}', '{self.germination_period}', '{self.color}')"
+        )
