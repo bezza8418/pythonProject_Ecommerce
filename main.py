@@ -1,62 +1,114 @@
 """
-Основной модуль для демонстрации работы классов Product и Category.
+Основной модуль для демонстрации работы классов.
 """
 
-import os
 from src.category import Category
-from src.product import Product
-from src.utils import load_categories_from_json
+from src.product import Product, Smartphone, LawnGrass
 
 
 def main():
     """Демонстрация работы классов."""
-    # Сброс счетчиков для чистоты демонстрации
-    Category.category_count = 0
-    Category.product_count = 0
-
-    # Способ 1: Создание объектов вручную
-    print("=== СОЗДАНИЕ ВРУЧНУЮ ===")
+    # Создаем обычные товары
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
+    # Выводим информацию о товарах
+    print("=== ТОВАРЫ (Product) ===")
+    print(product1)
+    print(product2)
+    print(product3)
+
+    # Создаем категорию с товарами
     category1 = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
         [product1, product2, product3]
     )
 
-    print(f"Создана категория: {category1.name} с {len(category1.products)} товарами")
-    print(f"  - {product1.name}: {product1.price} руб., {product1.quantity} шт.")
-    print(f"  - {product2.name}: {product2.price} руб., {product2.quantity} шт.")
-    print(f"  - {product3.name}: {product3.price} руб., {product3.quantity} шт.")
+    print("\n=== КАТЕГОРИЯ ===")
+    print(category1)
 
-    # Способ 2: Загрузка из JSON
-    print("\n=== ЗАГРУЗКА ИЗ JSON ===")
-    json_path = os.path.join(os.path.dirname(__file__), "data", "products.json")
-
+    # Создаем смартфон
+    phone = None
     try:
-        categories = load_categories_from_json(json_path)
-
-        print(f"Загружено категорий: {len(categories)}")
-        for i, category in enumerate(categories, 1):
-            print(f"\n{i}. {category.name}")
-            print(f"   Описание: {category.description[:60]}...")
-            print(f"   Товаров: {len(category.products)}")
-
-            for product in category.products:
-                print(f"     - {product.name}: {product.price} руб., {product.quantity} шт.")
-
-    except FileNotFoundError:
-        print(f"Файл {json_path} не найден. Создайте его для загрузки данных.")
+        phone = Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB, Серый цвет, 200MP камера",
+            180000.0,
+            5,
+            "Snapdragon 8 Gen 2",
+            "SM-S918B",
+            256,
+            "Серый"
+        )
+        print("\n=== СМАРТФОН ===")
+        print(phone)
+        print(f"Производительность: {phone.efficiency}")
+        print(f"Модель: {phone.model}")
+        print(f"Память: {phone.memory}GB")
+        print(f"Цвет: {phone.color}")
     except Exception as e:
-        print(f"Ошибка при загрузке JSON: {e}")
+        print(f"Ошибка при создании смартфона: {e}")
 
-    # Общая статистика
-    print("\n=== ОБЩАЯ СТАТИСТИКА ===")
+    # Создаем газонную траву
+    grass = None
+    try:
+        grass = LawnGrass(
+            "Газон 'Изумрудный'",
+            "Семена газонной травы",
+            500.0,
+            10,
+            "Россия",
+            "7-10 дней",
+            "Зеленый"
+        )
+        print("\n=== ГАЗОННАЯ ТРАВА ===")
+        print(grass)
+        print(f"Страна: {grass.country}")
+        print(f"Срок прорастания: {grass.germination_period}")
+        print(f"Цвет: {grass.color}")
+    except Exception as e:
+        print(f"Ошибка при создании газонной травы: {e}")
+
+    # Добавляем новые товары в категорию
+    print("\n=== ДОБАВЛЕНИЕ В КАТЕГОРИЮ ===")
+    try:
+        if phone is not None:
+            category1.add_product(phone)
+        if grass is not None:
+            category1.add_product(grass)
+        print("Товары успешно добавлены в категорию")
+        print(category1)
+    except TypeError as e:
+        print(f"Ошибка при добавлении: {e}")
+
+    # Проверяем сложение товаров
+    print("\n=== СЛОЖЕНИЕ ТОВАРОВ ===")
+    try:
+        total = product1 + product2
+        print(f"product1 + product2 = {total}")
+
+        # Попытка сложить товары разных классов
+        if phone is not None and grass is not None:
+            total = phone + grass
+            print(f"phone + grass = {total}")
+    except TypeError as e:
+        print(f"Ошибка при сложении: {e}")
+
+    # Перебираем товары в категории
+    print("\n=== ПЕРЕБОР ТОВАРОВ В КАТЕГОРИИ ===")
+    for product in category1:
+        print(product)
+
+    # Статистика
+    print("\n=== СТАТИСТИКА ===")
     print(f"Всего категорий: {Category.category_count}")
     print(f"Всего товаров: {Category.product_count}")
 
 
 if __name__ == "__main__":
+    # Сброс счетчиков для чистоты демонстрации
+    Category.category_count = 0
+    Category.product_count = 0
     main()
