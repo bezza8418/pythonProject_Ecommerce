@@ -4,6 +4,7 @@
 
 from typing import Iterator, List, Optional
 
+from src.base import BaseEntity
 from src.product import Product
 
 
@@ -36,7 +37,7 @@ class CategoryIterator:
         return product
 
 
-class Category:
+class Category(BaseEntity):
     """Класс для представления категории товаров."""
 
     # Атрибуты класса (общие для всех объектов)
@@ -54,6 +55,7 @@ class Category:
             description: Описание категории
             products: Список товаров в категории (по умолчанию пустой список)
         """
+        super().__init__()  # Вызов конструктора BaseEntity
         self.name = name
         self.description = description
         self.__products = products if products is not None else []
