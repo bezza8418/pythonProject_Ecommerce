@@ -1,6 +1,8 @@
 """Пакет для работы с интернет-магазином."""
 
+from src.base import BaseEntity
 from src.category import Category
+from src.order import Order
 from src.product import Product
 from src.utils import load_categories_from_json, save_categories_to_json
 
@@ -9,4 +11,6 @@ __all__ = [
     "Category",
     "load_categories_from_json",
     "save_categories_to_json",
+    "BaseEntity",
+    "Order",
 ]

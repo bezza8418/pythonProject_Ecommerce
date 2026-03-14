@@ -4,6 +4,7 @@
 
 import pytest
 
+from src.base_product import BaseProduct
 from src.product import LawnGrass, Product, Smartphone
 
 
@@ -410,3 +411,69 @@ class TestProductEdgeCases:
         assert product.name == "Duplicate Product"
         assert product.price == 50.0
         assert product.quantity == 5
+
+
+class TestProductCreationMixin:
+    """Тесты для миксина создания продуктов."""
+
+    def test_product_creation_logging(self, capsys):
+        """Тест логирования при создании продукта."""
+        Product("Test Product", "Test Description", 100.0, 5)
+        captured = capsys.readouterr()
+
+        assert "Создан объект: Product" in captured.out
+        assert "Test Product" in captured.out
+        assert "100.0" in captured.out
+        assert "5" in captured.out
+
+    def test_smartphone_creation_logging(self, capsys):
+        """Тест логирования при создании смартфона."""
+        Smartphone(
+            "Samsung Galaxy S23 Ultra",
+            "256GB, Серый цвет, 200MP камера",
+            180000.0,
+            5,
+            "Snapdragon 8 Gen 2",
+            "SM-S918B",
+            256,
+            "Серый",
+        )
+        captured = capsys.readouterr()
+
+        assert "Создан объект: Smartphone" in captured.out
+        assert "Samsung Galaxy S23 Ultra" in captured.out
+        assert "Snapdragon" in captured.out
+
+    def test_lawn_grass_creation_logging(self, capsys):
+        """Тест логирования при создании газонной травы."""
+        LawnGrass(
+            "Газон 'Изумрудный'",
+            "Семена газонной травы",
+            500.0,
+            10,
+            "Россия",
+            "7-10 дней",
+            "Зеленый",
+        )
+        captured = capsys.readouterr()
+
+        assert "Создан объект: LawnGrass" in captured.out
+        assert "Газон 'Изумрудный'" in captured.out
+        assert "Россия" in captured.out
+
+
+class TestBaseProduct:
+    """Тесты для абстрактного базового класса."""
+
+    def test_product_inherits_from_base(self):
+        """Тест, что Product наследуется от BaseProduct."""
+        assert issubclass(Product, BaseProduct)
+
+    def test_smartphone_inherits_from_base(self):
+        """Тест, что Smartphone наследуется от BaseProduct через Product."""
+        assert issubclass(Smartphone, BaseProduct)
+
+    def test_base_product_cannot_be_instantiated(self):
+        """Тест, что нельзя создать экземпляр абстрактного класса."""
+        with pytest.raises(TypeError):
+            BaseProduct("Test", "Desc", 100.0, 5)

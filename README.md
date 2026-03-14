@@ -2,331 +2,51 @@
 
 ## 📋 Описание
 
-Проект представляет собой ядро интернет-магазина с базовыми классами для работы с товарами и категориями. Реализована загрузка данных из/в JSON-файла.
+Ядро интернет-магазина с классами для товаров, категорий и заказов.
 
 ### Основные возможности:
-- ✅ Создание товаров с названием, описанием, ценой и количеством
-- ✅ Создание категорий с названием, описанием и списком товаров
-- ✅ Автоматический подсчет количества категорий и товаров
-- ✅ Загрузка данных из JSON-файла
-- ✅ Сохранение данных в JSON-файл
-- ✅ Приватные атрибуты для защиты данных (`__products`, `__price`)
-- ✅ Геттеры и сеттеры с валидацией
-- ✅ Класс-метод для создания товаров из словаря
-- ✅ Подтверждение при понижении цены
-- ✅ Магические методы для красивого вывода (`__str__`)
-- ✅ Магический метод сложения (`__add__`) для подсчета стоимости всех товаров
-- ✅ Итератор для перебора товаров в категории
-- ✅ Классы-наследники: Смартфон (`Smartphone`) и Газонная трава (`LawnGrass`)
-- ✅ Проверка типов при сложении товаров (нельзя складывать разные классы)
-- ✅ Защита от добавления не-продуктов в категорию
+- ✅ Товары, категории, заказы
+- ✅ Загрузка/сохранение в JSON
+- ✅ Приватные атрибуты, геттеры/сеттеры
+- ✅ Классы-наследники (`Smartphone`, `LawnGrass`)
+- ✅ Магические методы и итераторы
+- ✅ Логирование создания объектов
 
 ## 🚀 Установка
 
-1. **Клонируйте репозиторий:**
 ```bash
 git clone https://github.com/bezza8418/pythonProject_Ecommerce
 cd pythonProject_Ecommerce
-```
-
-Установите зависимости через Poetry:
-```bash
 poetry install
 ```
 
-## 📚 Использование
-### Базовые операции:
-- Создание товаров и категорий вручную:
+## 📚 Примеры использования
+### Товары и категории
 ```python
 from src.product import Product
 from src.category import Category
 
-# Создание товаров
-product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-
-# Создание категории
-category = Category("Смартфоны", "Описание категории", [product1, product2])
+product = Product("Смартфон", "Описание", 50000.0, 10)
+category = Category("Электроника", "Описание", [product])
 ```
 
-- Загрузка из JSON:
-```python
-from src.utils import load_categories_from_json
-
-# Загружаем категории из файла
-categories = load_categories_from_json("data/products.json")
-
-# Выводим информацию о каждой категории
-for cat in categories:
-    print(f"{cat.name}: {len(cat.products_list)} товаров")
-```
-
-- Сохранение в JSON:
-```python
-from src.utils import load_categories_from_json, save_categories_to_json
-
-# Загружаем категории из файла
-categories = load_categories_from_json("data/products.json")
-
-# Сохраняем их в новый файл
-save_categories_to_json(categories, "data/new_products.json")
-```
-
-### 🆕 Новые возможности (версия 2.0)
-Защита данных:
-- Атрибут products в классе Category теперь приватный (__products)
-- Атрибут price в классе Product теперь приватный (__price)
-
-Добавление товаров в категорию:
+### Заказы
 ```python
 from src.product import Product
-from src.category import Category
+from src.order import Order
 
-# Создаем товары
-product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+# Сначала создаем товар
+product = Product("Смартфон", "Описание", 50000.0, 10)
 
-# Создаем категорию
-category = Category("Смартфоны", "Описание категории", [product1, product2])
-
-# Создаем новый товар
-new_product = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
-
-# Добавляем товар через специальный метод
-category.add_product(new_product)
+# Потом создаем заказ
+order = Order(product, 2)
+print(order)  # Заказ: Смартфон x2 = 100000.0 руб.
 ```
 
-Просмотр товаров через геттер
+## Логирование создания
 ```python
-# Предположим, у нас есть категория с товарами
-from src.product import Product
-from src.category import Category
-
-# Создаем товары
-product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-
-# Создаем категорию
-category = Category("Смартфоны", "Описание категории", [product1, product2])
-
-# Геттер возвращает красиво отформатированную строку
-print(category.products)
-# Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт.
-# Iphone 15, 210000.0 руб. Остаток: 8 шт.
-```
-
-Создание товаров из словаря
-```python
-from src.product import Product
-
-# Создаем товар из словаря
-data = {
-    "name": "Samsung Galaxy S23 Ultra",
-    "description": "256GB, Серый цвет, 200MP камера",
-    "price": 180000.0,
-    "quantity": 5
-}
-product = Product.new_product(data)
-
-# При наличии дубликатов происходит объединение
-product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-existing_products = [product1, product2]
-
-# Создаем новый товар с проверкой дубликатов
-data2 = {
-    "name": "Samsung Galaxy S23 Ultra",
-    "description": "Новое описание",
-    "price": 190000.0,
-    "quantity": 3
-}
-new_product = Product.new_product(data2, existing_products)
-# Количество складывается (5+3=8), цена выбирается максимальная (190000.0)
-```
-
-Безопасное изменение цены
-```python
-from src.product import Product
-
-product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-
-product.price = 200000.0  # Повышение цены без подтверждения
-product.price = 150000.0  # Понижение цены требует подтверждения
-# Вы действительно хотите понизить цену? (y/n)
-```
-
-**Магические методы:**
-
-- Строковое представление товара:
-```python
-from src.product import Product
-
-product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-print(product)
-# Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт.
-```
-
-- Строковое представление категории:
-
-```python
-from src.product import Product
-from src.category import Category
-
-product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-category = Category("Смартфоны", "Описание категории", [product1, product2])
-
-print(category)
-# Смартфоны, количество продуктов: 13 шт.
-```
-
-- Сложение товаров (общая стоимость на складе):
-
-```python
-from src.product import Product
-
-product1 = Product("Товар 1", "Описание 1", 100.0, 10)
-product2 = Product("Товар 2", "Описание 2", 200.0, 2)
-
-total_value = product1 + product2
-print(total_value)  # 100*10 + 200*2 = 1400
-```
-
-- Перебор товаров в категории:
-
-```python
-from src.product import Product
-from src.category import Category
-
-product1 = Product("Товар 1", "Описание 1", 100.0, 10)
-product2 = Product("Товар 2", "Описание 2", 200.0, 2)
-category = Category("Пример", "Описание", [product1, product2])
-
-for product in category:
-    print(product)
-# Перебирает все товары в категории по порядку
-```
-
-### 🆕 Новые возможности (версия 3.0)
-
-#### Классы-наследники
-
-**Смартфон (`Smartphone`)** — расширяет базовый класс `Product` дополнительными атрибутами:
-- `efficiency` — производительность
-- `model` — модель
-- `memory` — объем встроенной памяти
-- `color` — цвет
-
-```python
-from src.product import Smartphone
-
-phone = Smartphone(
-    "Samsung Galaxy S23 Ultra",
-    "256GB, Серый цвет, 200MP камера",
-    180000.0,
-    5,
-    "Snapdragon 8 Gen 2",
-    "SM-S918B",
-    256,
-    "Серый"
-)
-```
-
-**Газонная трава (LawnGrass)** — расширяет базовый класс Product дополнительными атрибутами:
-
-- `country` — страна-производитель
-- `germination_period` — срок прорастания
-- `color` — цвет
-
-```python
-from src.product import LawnGrass
-
-grass = LawnGrass(
-    "Газон 'Изумрудный'",
-    "Семена газонной травы",
-    500.0,
-    10,
-    "Россия",
-    "7-10 дней",
-    "Зеленый"
-)
-```
-
-**Умное сложение товаров** - теперь нельзя сложить товары разных классов:
-
-```python
-from src.product import Smartphone, LawnGrass
-
-phone = Smartphone(
-    "Samsung Galaxy S23 Ultra",
-    "256GB, Серый цвет, 200MP камера",
-    180000.0,
-    5,
-    "Snapdragon 8 Gen 2",
-    "SM-S918B",
-    256,
-    "Серый"
-)
-
-grass = LawnGrass(
-    "Газон 'Изумрудный'",
-    "Семена газонной травы",
-    500.0,
-    10,
-    "Россия",
-    "7-10 дней",
-    "Зеленый"
-)
-
-# Это вызовет ошибку TypeError
-try:
-    total = phone + grass  # Нельзя складывать смартфон и траву
-except TypeError as e:
-    print(e)  # Нельзя складывать товары разных классов
-```
-
-**Безопасное добавление в категорию** - метод add_product() теперь проверяет, что добавляется именно продукт (или его наследник):
-
-```python
-from src.product import Smartphone, LawnGrass
-from src.category import Category
-
-# Создаем категорию
-category = Category("Смартфоны", "Разные смартфоны")
-
-# Создаем товары
-phone = Smartphone(
-    "Samsung Galaxy S23 Ultra",
-    "256GB, Серый цвет, 200MP камера",
-    180000.0,
-    5,
-    "Snapdragon 8 Gen 2",
-    "SM-S918B",
-    256,
-    "Серый"
-)
-
-grass = LawnGrass(
-    "Газон 'Изумрудный'",
-    "Семена газонной травы",
-    500.0,
-    10,
-    "Россия",
-    "7-10 дней",
-    "Зеленый"
-)
-
-# Добавляем в категорию
-category.add_product(phone)   # ✅ OK
-category.add_product(grass)    # ✅ OK
-
-# Метод add_product принимает только объекты класса Product или его наследников
-# Передача других типов данных вызовет TypeError
-```
-
-### Запуск демонстрации:
-```bash
-poetry run python main.py
+# При создании автоматически выводится:
+# Создан объект: Product('Смартфон', 'Описание', 50000.0, 10)
 ```
 
 ## 🧪 Тестирование
@@ -345,14 +65,18 @@ poetry run pytest --cov=src --cov-report=html
 ```
 
 ## 📊 Покрытие тестами
-### Статистика покрытия (90%)
-| Модуль        | Строк   | Пропущено | Покрытие |
-|---------------|---------|-----------|----------|
-| `__init__.py` | 4       | 0         | 100%     |
-| `category.py` | 44      | 1         | 98%      |
-| `product.py`  | 89      | 8         | 91%      |
-| `utils.py`    | 51      | 9         | 82%      |
-| **ИТОГО**     | **188** | **18**    | **89%**  |
+### Статистика покрытия (95%)
+| Модуль            | Строк   | Пропущено | Покрытие |
+|-------------------|---------|-----------|----------|
+| `__init__.py`     | 6       | 0         | 100%     |
+| `base.py`         | 5       | 0         | 100%     |
+| `base_product.py` | 3       | 0         | 100%     |
+| `category.py`     | 46      | 1         | 98%      |
+| `mixins.py`       | 6       | 1         | 83%      |
+| `order.py`        | 12      | 0         | 100%     |
+| `product.py`      | 88      | 0         | 100%     |
+| `utils.py`        | 51      | 9         | 82%      |
+| **ИТОГО**         | **217** | **11**    | **95%**  |
 
 Просмотр отчета:
 
@@ -379,12 +103,17 @@ pythonProject_Ecommerce/
 ├── htmlcov/                # Отчет о покрытии тестами
 ├── src/                    # Исходный код
 │   ├── __init__.py
+│   ├── base.py             # Абстрактный базовый класс BaseEntity
+│   ├── base_product.py     # Абстрактный базовый класс для продуктов
 │   ├── category.py         # Класс Category
+│   ├── mixins.py           # Классы-миксины (CreationMixin)
+│   ├── order.py            # Класс Order
 │   ├── product.py          # Класс Product
 │   └── utils.py            # Утилиты для работы с JSON
 ├── tests/                  # Тесты
 │   ├── __init__.py
 │   ├── test_category.py
+│   ├── test_order.py
 │   ├── test_product.py
 │   └── test_utils.py
 ├── .flake8                 # Конфигурация flake8
