@@ -59,15 +59,17 @@ def load_categories_from_json(file_path: str) -> List[Category]:
 
                 prod_description = prod_data.get("description", "")
 
+                # fmt: off
                 try:
                     prod_price = float(prod_data.get("price", 0))
-                except TypeError, ValueError:
+                except (TypeError, ValueError):  # noqa: E722
                     prod_price = 0.0
 
                 try:
                     prod_quantity = int(prod_data.get("quantity", 0))
-                except TypeError, ValueError:
+                except (TypeError, ValueError):  # noqa: E722
                     prod_quantity = 0
+                # fmt: on
 
                 product = Product(
                     name=prod_name,
@@ -82,9 +84,11 @@ def load_categories_from_json(file_path: str) -> List[Category]:
 
         return categories
 
-    except FileNotFoundError, json.JSONDecodeError:
+    # fmt: off
+    except (FileNotFoundError, json.JSONDecodeError):  # noqa: E722
         # Пробрасываем исключения дальше (они обрабатываются в тестах)
         raise
+    # fmt: on
 
 
 def save_categories_to_json(categories: List[Category], file_path: str) -> None:
