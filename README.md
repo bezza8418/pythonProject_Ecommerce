@@ -11,6 +11,9 @@
 - ✅ Классы-наследники (`Smartphone`, `LawnGrass`)
 - ✅ Магические методы и итераторы
 - ✅ Логирование создания объектов
+- ✅ Проверка на нулевое количество при создании товара (ZeroQuantityError)
+- ✅ Метод `average_price` для подсчета средней цены в категории
+- ✅ Пользовательское исключение `ZeroQuantityError`
 
 ## 🚀 Установка
 
@@ -49,6 +52,30 @@ print(order)  # Заказ: Смартфон x2 = 100000.0 руб.
 # Создан объект: Product('Смартфон', 'Описание', 50000.0, 10)
 ```
 
+## ⚠️ Обработка исключений
+### Проверка нулевого количества
+При попытке создать товар с нулевым количеством выбрасывается исключение:
+```python
+from src.product import Product
+from src.exceptions import ZeroQuantityError
+
+try:
+    product = Product("Телефон", "Описание", 50000.0, 0)
+except ZeroQuantityError as e:
+    print(e)  # Товар с нулевым количеством не может быть добавлен
+```
+### Средний ценник в категории
+```python
+from src.category import Category
+from src.product import Product
+
+category = Category("Электроника", "Описание")
+category.add_product(Product("Смартфон", "", 50000.0, 5))
+category.add_product(Product("Ноутбук", "", 80000.0, 3))
+
+print(category.average_price())  # (50000 + 80000) / 2 = 65000.0
+```
+
 ## 🧪 Тестирование
 ```bash
 # Запуск всех тестов
@@ -71,12 +98,13 @@ poetry run pytest --cov=src --cov-report=html
 | `__init__.py`     | 6       | 0         | 100%     |
 | `base.py`         | 5       | 0         | 100%     |
 | `base_product.py` | 3       | 0         | 100%     |
-| `category.py`     | 46      | 1         | 98%      |
+| `category.py`     | 57      | 4         | 93%      |
+| `exceptions.py`   | 4       | 0         | 100%     |
 | `mixins.py`       | 6       | 1         | 83%      |
-| `order.py`        | 12      | 0         | 100%     |
-| `product.py`      | 88      | 0         | 100%     |
+| `order.py`        | 13      | 0         | 100%     |
+| `product.py`      | 91      | 0         | 100%     |
 | `utils.py`        | 51      | 9         | 82%      |
-| **ИТОГО**         | **217** | **11**    | **95%**  |
+| **ИТОГО**         | **236** | **14**    | **94%**  |
 
 Просмотр отчета:
 
@@ -106,6 +134,7 @@ pythonProject_Ecommerce/
 │   ├── base.py             # Абстрактный базовый класс BaseEntity
 │   ├── base_product.py     # Абстрактный базовый класс для продуктов
 │   ├── category.py         # Класс Category
+│   ├── exceptions.py       # Пользовательские исключения
 │   ├── mixins.py           # Классы-миксины (CreationMixin)
 │   ├── order.py            # Класс Order
 │   ├── product.py          # Класс Product
@@ -113,6 +142,7 @@ pythonProject_Ecommerce/
 ├── tests/                  # Тесты
 │   ├── __init__.py
 │   ├── test_category.py
+│   ├── test_exceptions.py
 │   ├── test_order.py
 │   ├── test_product.py
 │   └── test_utils.py
