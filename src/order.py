@@ -3,9 +3,9 @@
 """
 
 from src.base import BaseEntity
+from src.exceptions import ZeroQuantityError
 from src.product import Product
 
-from src.exceptions import ZeroQuantityError
 
 class Order(BaseEntity):
     """

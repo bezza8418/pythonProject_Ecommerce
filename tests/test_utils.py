@@ -160,13 +160,13 @@ class TestUtils:
                     {
                         "name": "Товар без цены",
                         "description": "Описание",
-                        "quantity": 5  # Добавили количество
+                        "quantity": 5,  # Добавили количество
                     }
-                ]
+                ],
             }
         ]
         json_path = tmp_path / "missing_fields.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(json_data, f)
 
         categories = load_categories_from_json(str(json_path))

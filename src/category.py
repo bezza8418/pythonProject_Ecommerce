@@ -4,9 +4,8 @@
 
 from typing import Iterator, List, Optional
 
-from src.exceptions import ZeroQuantityError
-
 from src.base import BaseEntity
+from src.exceptions import ZeroQuantityError
 from src.product import Product
 
 
@@ -104,10 +103,14 @@ class Category(BaseEntity):
             ZeroQuantityError: Если количество товара равно 0
         """
         if not isinstance(product, Product):
-            raise TypeError("Можно добавлять только объекты класса Product или его наследников")
+            raise TypeError(
+                "Можно добавлять только объекты класса Product или его наследников"
+            )
 
         if product.quantity == 0:
-            raise ZeroQuantityError("Товар с нулевым количеством не может быть добавлен")
+            raise ZeroQuantityError(
+                "Товар с нулевым количеством не может быть добавлен"
+            )
 
         self.__products.append(product)
         Category.product_count += 1

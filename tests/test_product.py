@@ -4,9 +4,9 @@
 
 import pytest
 
-from src.product import Product, Smartphone, LawnGrass
 from src.base_product import BaseProduct
 from src.exceptions import ZeroQuantityError
+from src.product import LawnGrass, Product, Smartphone
 
 
 class TestProduct:
@@ -14,7 +14,9 @@ class TestProduct:
 
     def test_product_initialization(self):
         """Тест инициализации товара."""
-        product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+        product = Product(
+            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+        )
 
         assert product.name == "Samsung Galaxy S23 Ultra"
         assert product.description == "256GB, Серый цвет, 200MP камера"
@@ -78,7 +80,9 @@ class TestProductMagicMethods:
 
     def test_product_str(self):
         """Тест строкового представления товара."""
-        product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+        product = Product(
+            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+        )
         expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
         assert str(product) == expected
 
@@ -96,7 +100,9 @@ class TestProductMagicMethods:
         """Тест сложения товара с не-товаром."""
         product = Product("Product", "Desc", 100.0, 5)
 
-        with pytest.raises(TypeError, match="Можно складывать только с объектами класса Product"):
+        with pytest.raises(
+            TypeError, match="Можно складывать только с объектами класса Product"
+        ):
             product + 100
 
     def test_product_add_with_self(self):
@@ -122,7 +128,7 @@ class TestSmartphone:
             "Snapdragon 8 Gen 2",
             "SM-S918B",
             256,
-            "Серый"
+            "Серый",
         )
 
         assert phone.name == "Samsung Galaxy S23 Ultra"
@@ -143,7 +149,7 @@ class TestSmartphone:
             "Snapdragon 8 Gen 2",
             "SM-S918B",
             256,
-            "Серый"
+            "Серый",
         )
         expected = "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
         assert str(phone) == expected
@@ -161,7 +167,7 @@ class TestLawnGrass:
             10,
             "Россия",
             "7-10 дней",
-            "Зеленый"
+            "Зеленый",
         )
 
         assert grass.name == "Газон 'Изумрудный'"
@@ -180,7 +186,7 @@ class TestLawnGrass:
             10,
             "Россия",
             "7-10 дней",
-            "Зеленый"
+            "Зеленый",
         )
         expected = "Газон 'Изумрудный', 500.0 руб. Остаток: 10 шт."
         assert str(grass) == expected
@@ -192,12 +198,17 @@ class TestProductAdditionRestrictions:
     def test_add_same_classes(self):
         """Тест сложения объектов одного класса."""
         phone1 = Smartphone(
-            "Samsung Galaxy S23 Ultra", "256GB", 180000.0, 5,
-            "Snapdragon", "SM-S918B", 256, "Серый"
+            "Samsung Galaxy S23 Ultra",
+            "256GB",
+            180000.0,
+            5,
+            "Snapdragon",
+            "SM-S918B",
+            256,
+            "Серый",
         )
         phone2 = Smartphone(
-            "Iphone 15", "512GB", 210000.0, 8,
-            "A16", "A3090", 512, "Black"
+            "Iphone 15", "512GB", 210000.0, 8, "A16", "A3090", 512, "Black"
         )
 
         result = phone1 + phone2
@@ -207,12 +218,17 @@ class TestProductAdditionRestrictions:
     def test_add_different_classes(self):
         """Тест сложения объектов разных классов."""
         phone = Smartphone(
-            "Samsung Galaxy S23 Ultra", "256GB", 180000.0, 5,
-            "Snapdragon", "SM-S918B", 256, "Серый"
+            "Samsung Galaxy S23 Ultra",
+            "256GB",
+            180000.0,
+            5,
+            "Snapdragon",
+            "SM-S918B",
+            256,
+            "Серый",
         )
         grass = LawnGrass(
-            "Газон 'Изумрудный'", "Семена", 500.0, 10,
-            "Россия", "7-10 дней", "Зеленый"
+            "Газон 'Изумрудный'", "Семена", 500.0, 10, "Россия", "7-10 дней", "Зеленый"
         )
 
         with pytest.raises(TypeError, match="Нельзя складывать товары разных классов"):
@@ -225,56 +241,56 @@ class TestProductNewProduct:
     def test_new_product_simple(self):
         """Тест создания продукта из словаря."""
         data = {
-            'name': 'Test Product',
-            'description': 'Test Description',
-            'price': 99.99,
-            'quantity': 10
+            "name": "Test Product",
+            "description": "Test Description",
+            "price": 99.99,
+            "quantity": 10,
         }
 
         product = Product.new_product_simple(data)
 
-        assert product.name == 'Test Product'
-        assert product.description == 'Test Description'
+        assert product.name == "Test Product"
+        assert product.description == "Test Description"
         assert product.price == 99.99
         assert product.quantity == 10
 
     def test_new_product_with_duplicate_check_no_duplicates(self):
         """Тест создания продукта без дубликатов."""
         data = {
-            'name': 'New Product',
-            'description': 'New Description',
-            'price': 50.0,
-            'quantity': 5
+            "name": "New Product",
+            "description": "New Description",
+            "price": 50.0,
+            "quantity": 5,
         }
 
         existing = [
             Product("Existing 1", "Desc 1", 100.0, 2),
-            Product("Existing 2", "Desc 2", 200.0, 3)
+            Product("Existing 2", "Desc 2", 200.0, 3),
         ]
 
         product = Product.new_product(data, existing)
 
-        assert product.name == 'New Product'
+        assert product.name == "New Product"
         assert product.quantity == 5
         assert len(existing) == 2  # Список не изменился
 
     def test_new_product_with_duplicate(self):
         """Тест создания продукта с дубликатом."""
         data = {
-            'name': 'Duplicate Product',
-            'description': 'New Description',
-            'price': 50.0,
-            'quantity': 5
+            "name": "Duplicate Product",
+            "description": "New Description",
+            "price": 50.0,
+            "quantity": 5,
         }
 
         existing = [
             Product("Duplicate Product", "Old Desc", 30.0, 2),
-            Product("Other Product", "Desc", 100.0, 3)
+            Product("Other Product", "Desc", 100.0, 3),
         ]
 
         product = Product.new_product(data, existing)
 
-        assert product.name == 'Duplicate Product'
+        assert product.name == "Duplicate Product"
         assert product.quantity == 7  # 5 + 2
         assert product.price == 50.0  # Взяли максимальную цену
         assert len(existing) == 1  # Дубликат удален, остался только Other Product
@@ -282,10 +298,10 @@ class TestProductNewProduct:
     def test_new_product_with_duplicate_max_price(self):
         """Тест выбора максимальной цены при дубликате."""
         data = {
-            'name': 'Duplicate Product',
-            'description': 'New Description',
-            'price': 30.0,  # Меньше чем у существующего
-            'quantity': 5
+            "name": "Duplicate Product",
+            "description": "New Description",
+            "price": 30.0,  # Меньше чем у существующего
+            "quantity": 5,
         }
 
         existing = [
@@ -306,7 +322,7 @@ class TestProductPriceConfirmation:
         product = Product("Test", "Desc", 100.0, 5)
 
         # Имитируем ввод 'y'
-        monkeypatch.setattr('builtins.input', lambda _: 'y')
+        monkeypatch.setattr("builtins.input", lambda _: "y")
 
         product.price = 80.0
         captured = capsys.readouterr()
@@ -320,7 +336,7 @@ class TestProductPriceConfirmation:
         product = Product("Test", "Desc", 100.0, 5)
 
         # Имитируем ввод 'n'
-        monkeypatch.setattr('builtins.input', lambda _: 'n')
+        monkeypatch.setattr("builtins.input", lambda _: "n")
 
         product.price = 80.0
         captured = capsys.readouterr()
@@ -346,10 +362,10 @@ class TestProductEdgeCases:
     def test_new_product_with_string_price(self):
         """Тест создания продукта с ценой в виде строки."""
         data = {
-            'name': 'Test Product',
-            'description': 'Test Description',
-            'price': '99.99',
-            'quantity': '10'
+            "name": "Test Product",
+            "description": "Test Description",
+            "price": "99.99",
+            "quantity": "10",
         }
 
         product = Product.new_product_simple(data)
@@ -360,10 +376,10 @@ class TestProductEdgeCases:
     def test_new_product_with_invalid_string_price(self):
         """Тест создания продукта с некорректной строкой цены."""
         data = {
-            'name': 'Test Product',
-            'description': 'Test Description',
-            'price': 'invalid',
-            'quantity': 'invalid'  # 'invalid' превращается в 0
+            "name": "Test Product",
+            "description": "Test Description",
+            "price": "invalid",
+            "quantity": "invalid",  # 'invalid' превращается в 0
         }
 
         with pytest.raises(ZeroQuantityError):
@@ -375,17 +391,17 @@ class TestProductEdgeCases:
         product2 = Product("Product 2", "Desc 2", 200.0, 3)
 
         data = {
-            'name': 'Duplicate Product',
-            'description': 'New Description',
-            'price': 50.0,
-            'quantity': 5
+            "name": "Duplicate Product",
+            "description": "New Description",
+            "price": 50.0,
+            "quantity": 5,
         }
 
         existing = [product1, product2]
 
         product = Product.new_product(data, existing)
 
-        assert product.name == 'Duplicate Product'
+        assert product.name == "Duplicate Product"
         assert product.price == 50.0
         assert product.quantity == 5
 
@@ -413,7 +429,7 @@ class TestProductCreationMixin:
             "Snapdragon 8 Gen 2",
             "SM-S918B",
             256,
-            "Серый"
+            "Серый",
         )
         captured = capsys.readouterr()
 
@@ -430,7 +446,7 @@ class TestProductCreationMixin:
             10,
             "Россия",
             "7-10 дней",
-            "Зеленый"
+            "Зеленый",
         )
         captured = capsys.readouterr()
 
@@ -461,5 +477,8 @@ class TestProductZeroQuantity:
 
     def test_product_zero_quantity_raises_error(self):
         """Тест, что при создании товара с quantity=0 выбрасывается ZeroQuantityError."""
-        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(
+            ZeroQuantityError,
+            match="Товар с нулевым количеством не может быть добавлен",
+        ):
             Product("Test Product", "Test Description", 100.0, 0)
