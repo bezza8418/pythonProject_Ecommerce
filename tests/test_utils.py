@@ -156,18 +156,24 @@ class TestUtils:
         json_data = [
             {
                 "name": "Категория без описания",
-                "products": [{"name": "Товар без цены", "description": "Описание"}],
+                "products": [
+                    {
+                        "name": "Товар без цены",
+                        "description": "Описание",
+                        "quantity": 5  # Добавили количество
+                    }
+                ]
             }
         ]
         json_path = tmp_path / "missing_fields.json"
-        with open(json_path, "w", encoding="utf-8") as f:
+        with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(json_data, f)
 
         categories = load_categories_from_json(str(json_path))
         assert len(categories) == 1
         assert categories[0].name == "Категория без описания"
-        assert categories[0].description == ""  # Пустая строка по умолчанию
+        assert categories[0].description == ""
         assert len(categories[0].products_list) == 1
         assert categories[0].products_list[0].name == "Товар без цены"
-        assert categories[0].products_list[0].price == 0.0  # Цена по умолчанию
-        assert categories[0].products_list[0].quantity == 0  # Количество по умолчанию
+        assert categories[0].products_list[0].price == 0.0
+        assert categories[0].products_list[0].quantity == 5  # Количество не 0

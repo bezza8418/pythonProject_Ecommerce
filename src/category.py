@@ -4,6 +4,8 @@
 
 from typing import Iterator, List, Optional
 
+from src.exceptions import ZeroQuantityError
+
 from src.base import BaseEntity
 from src.product import Product
 
@@ -99,14 +101,32 @@ class Category(BaseEntity):
 
         Raises:
             TypeError: Если передан не объект класса Product или его наследников
+            ZeroQuantityError: Если количество товара равно 0
         """
         if not isinstance(product, Product):
-            raise TypeError(
-                "Можно добавлять только объекты класса Product или его наследников"
-            )
+            raise TypeError("Можно добавлять только объекты класса Product или его наследников")
+
+        if product.quantity == 0:
+            raise ZeroQuantityError("Товар с нулевым количеством не может быть добавлен")
 
         self.__products.append(product)
         Category.product_count += 1
+
+    def average_price(self) -> float:
+        """
+        Возвращает средний ценник всех товаров в категории.
+
+        Returns:
+            Средняя цена товаров или 0, если товаров нет
+        """
+        if not self.__products:
+            return 0.0
+
+        try:
+            total_price = sum(product.price for product in self.__products)
+            return total_price / len(self.__products)
+        except ZeroDivisionError:
+            return 0.0
 
     def __str__(self) -> str:
         """

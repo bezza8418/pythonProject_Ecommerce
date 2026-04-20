@@ -5,6 +5,7 @@
 from src.base import BaseEntity
 from src.product import Product
 
+from src.exceptions import ZeroQuantityError
 
 class Order(BaseEntity):
     """
@@ -22,11 +23,12 @@ class Order(BaseEntity):
 
         Raises:
             ValueError: Если количество меньше или равно 0
+            ZeroQuantityError: Если количество равно 0
         """
         super().__init__()
 
         if quantity <= 0:
-            raise ValueError("Количество товара должно быть положительным")
+            raise ZeroQuantityError("Количество товара должно быть положительным")
 
         self.product = product
         self.quantity = quantity

@@ -361,3 +361,28 @@ class TestCategoryUtils:
 
         with pytest.raises(json.JSONDecodeError):
             load_categories_from_json(str(json_path))
+
+
+class TestCategoryAveragePrice:
+    """Тесты для метода average_price."""
+
+    def test_average_price_with_products(self, sample_category, sample_products):
+        """Тест расчета средней цены при наличии товаров."""
+        # sample_products: Samsung(180000), Iphone(210000), Xiaomi(31000)
+        # Средняя = (180000 + 210000 + 31000) / 3 = 421000 / 3 = 140333.33
+        avg = sample_category.average_price()
+        assert avg == (180000 + 210000 + 31000) / 3
+
+    def test_average_price_empty_category(self):
+        """Тест расчета средней цены для пустой категории."""
+        category = Category("Пустая", "Описание", [])
+        avg = category.average_price()
+        assert avg == 0.0
+
+    def test_average_price_after_add_product(self, sample_category, sample_products):
+        """Тест расчета средней цены после добавления товара."""
+        initial_avg = sample_category.average_price()
+        sample_category.add_product(sample_products[0])
+        new_avg = sample_category.average_price()
+
+        assert new_avg != initial_avg

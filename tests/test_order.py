@@ -5,8 +5,9 @@
 import pytest
 
 from src.base import BaseEntity
-from src.order import Order
 from src.product import Product
+from src.order import Order
+from src.exceptions import ZeroQuantityError
 
 
 class TestOrder:
@@ -40,14 +41,10 @@ class TestOrder:
         """Тест создания заказа с некорректным количеством."""
         product = Product("Test Product", "Test Description", 100.0, 10)
 
-        with pytest.raises(
-            ValueError, match="Количество товара должно быть положительным"
-        ):
+        with pytest.raises(ZeroQuantityError, match="Количество товара должно быть положительным"):
             Order(product, 0)
 
-        with pytest.raises(
-            ValueError, match="Количество товара должно быть положительным"
-        ):
+        with pytest.raises(ZeroQuantityError, match="Количество товара должно быть положительным"):
             Order(product, -5)
 
 
@@ -57,7 +54,6 @@ class TestOrderWithDifferentProducts:
     def test_order_with_smartphone(self):
         """Тест заказа со смартфоном."""
         from src.product import Smartphone
-
         phone = Smartphone(
             "Samsung Galaxy S23 Ultra",
             "256GB, Серый цвет, 200MP камера",
@@ -66,7 +62,7 @@ class TestOrderWithDifferentProducts:
             "Snapdragon 8 Gen 2",
             "SM-S918B",
             256,
-            "Серый",
+            "Серый"
         )
         order = Order(phone, 2)
 
@@ -76,7 +72,6 @@ class TestOrderWithDifferentProducts:
     def test_order_with_lawn_grass(self):
         """Тест заказа с газонной травой."""
         from src.product import LawnGrass
-
         grass = LawnGrass(
             "Газон 'Изумрудный'",
             "Семена газонной травы",
@@ -84,7 +79,7 @@ class TestOrderWithDifferentProducts:
             10,
             "Россия",
             "7-10 дней",
-            "Зеленый",
+            "Зеленый"
         )
         order = Order(grass, 7)
 
@@ -98,7 +93,6 @@ class TestBaseEntityInheritance:
     def test_category_inherits_from_base(self):
         """Тест, что Category наследуется от BaseEntity."""
         from src.category import Category
-
         assert issubclass(Category, BaseEntity)
 
     def test_order_inherits_from_base(self):

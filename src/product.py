@@ -7,13 +7,12 @@ from typing import Dict, List, Optional, Union
 from src.base_product import BaseProduct
 from src.mixins import CreationMixin
 
+from src.exceptions import ZeroQuantityError
 
 class Product(CreationMixin, BaseProduct):
     """Базовый класс для представления товара."""
 
-    def __init__(
-        self, name: str, description: str, price: Union[float, int], quantity: int
-    ) -> None:
+    def __init__(self, name: str, description: str, price: Union[float, int], quantity: int) -> None:
         """
         Инициализация товара.
 
@@ -22,7 +21,13 @@ class Product(CreationMixin, BaseProduct):
             description: Описание товара
             price: Цена товара (может быть с копейками)
             quantity: Количество товара в наличии
+
+        Raises:
+            ZeroQuantityError: Если количество товара равно 0
         """
+        if quantity == 0:
+            raise ZeroQuantityError("Товар с нулевым количеством не может быть добавлен")
+
         self.name = name
         self.description = description
         self.__price = float(price)
